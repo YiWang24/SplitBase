@@ -1,0 +1,261 @@
+/* DeFi Pixel Theme for SplitBase */
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* DeFi Pixel Colors - Based on reference */
+  --app-background: #e8f4fd;
+  --app-foreground: #1a1a1a;
+  --app-foreground-muted: #666666;
+  --app-accent: #00bfff;
+  --app-accent-hover: #0099cc;
+  --app-accent-active: #007799;
+  --app-accent-light: rgba(0, 191, 255, 0.1);
+  --app-gray: #f8fbff;
+  --app-gray-dark: #e8f2ff;
+  --app-card-bg: rgba(255, 255, 255, 0.9);
+  --app-card-border: #00bfff;
+
+  /* Additional DeFi Colors */
+  --app-cyan: #00bfff;
+  --app-blue: #4da6ff;
+  --app-light-blue: #80ccff;
+  --app-dark-blue: #0080cc;
+  --app-warning: #ff8c00;
+  --app-error: #ff4757;
+  --app-success: #2ed573;
+
+  /* Card styling */
+  --app-card-radius: 16px;
+  --app-button-radius: 12px;
+}
+
+/* Keep consistent light theme for DeFi aesthetic */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Use same light theme even in dark mode for consistency with reference */
+    --app-background: #e8f4fd;
+    --app-foreground: #1a1a1a;
+    --app-foreground-muted: #666666;
+    --app-accent: #00bfff;
+    --app-accent-hover: #0099cc;
+    --app-accent-active: #007799;
+    --app-accent-light: rgba(0, 191, 255, 0.1);
+    --app-gray: #f8fbff;
+    --app-gray-dark: #e8f2ff;
+    --app-card-bg: rgba(255, 255, 255, 0.9);
+    --app-card-border: #00bfff;
+  }
+}
+
+.mini-app-theme {
+  --ock-font-family: "Press Start 2P", "Orbitron", monospace;
+  --ock-border-radius: var(--app-card-radius);
+  --ock-border-radius-inner: var(--app-button-radius);
+
+  /* Text colors */
+  --ock-text-inverse: var(--app-background);
+  --ock-text-foreground: var(--app-foreground);
+  --ock-text-foreground-muted: var(--app-foreground-muted);
+  --ock-text-error: var(--app-error);
+  --ock-text-primary: var(--app-accent);
+  --ock-text-success: var(--app-success);
+  --ock-text-warning: var(--app-warning);
+  --ock-text-disabled: #666688;
+
+  /* Background colors */
+  --ock-bg-default: var(--app-background);
+  --ock-bg-default-hover: var(--app-gray);
+  --ock-bg-default-active: var(--app-gray-dark);
+  --ock-bg-alternate: var(--app-gray);
+  --ock-bg-alternate-hover: var(--app-gray-dark);
+  --ock-bg-alternate-active: var(--app-gray-dark);
+  --ock-bg-inverse: var(--app-foreground);
+  --ock-bg-inverse-hover: #22ff99;
+  --ock-bg-inverse-active: #44ffaa;
+  --ock-bg-primary: var(--app-accent);
+  --ock-bg-primary-hover: var(--app-accent-hover);
+  --ock-bg-primary-active: var(--app-accent-active);
+  --ock-bg-primary-washed: var(--app-accent-light);
+  --ock-bg-primary-disabled: #664466;
+  --ock-bg-secondary: var(--app-gray);
+  --ock-bg-secondary-hover: var(--app-gray-dark);
+  --ock-bg-secondary-active: #3a3a5a;
+  --ock-bg-error: rgba(255, 68, 68, 0.2);
+  --ock-bg-warning: rgba(255, 170, 0, 0.2);
+  --ock-bg-success: rgba(68, 255, 136, 0.2);
+  --ock-bg-default-reverse: var(--app-foreground);
+
+  /* Icon colors */
+  --ock-icon-color-primary: var(--app-accent);
+  --ock-icon-color-foreground: var(--app-foreground);
+  --ock-icon-color-foreground-muted: var(--app-foreground-muted);
+  --ock-icon-color-inverse: var(--app-background);
+  --ock-icon-color-error: var(--app-error);
+  --ock-icon-color-success: var(--app-success);
+  --ock-icon-color-warning: var(--app-warning);
+
+  /* Line colors */
+  --ock-line-primary: var(--app-accent);
+  --ock-line-default: var(--app-card-border);
+  --ock-line-heavy: var(--app-foreground-muted);
+  --ock-line-inverse: var(--app-foreground);
+
+  /* Apply pixel DeFi styling */
+  font-family: var(--ock-font-family);
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 50%, #e8f4fd 100%);
+  min-height: 100vh;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+* {
+  touch-action: manipulation;
+}
+
+body {
+  color: var(--app-foreground);
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 50%, #e8f4fd 100%);
+  font-family: "Press Start 2P", "Orbitron", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  image-rendering: pixelated;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .defi-border {
+    border: 2px solid var(--app-card-border);
+  }
+
+  .defi-shadow {
+    box-shadow:
+      0 4px 20px rgba(0, 191, 255, 0.15),
+      0 2px 8px rgba(0, 191, 255, 0.1);
+  }
+
+  .defi-glow {
+    box-shadow:
+      0 0 20px rgba(0, 191, 255, 0.3),
+      0 0 40px rgba(0, 191, 255, 0.2);
+  }
+
+  .defi-card {
+    background: var(--app-card-bg);
+    border: 2px solid var(--app-card-border);
+    border-radius: var(--app-card-radius);
+    box-shadow:
+      0 4px 20px rgba(0, 191, 255, 0.15),
+      0 2px 8px rgba(0, 191, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .defi-button {
+    background: var(--app-accent);
+    border: 2px solid var(--app-accent);
+    border-radius: var(--app-button-radius);
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .defi-button:hover {
+    background: var(--app-accent-hover);
+    border-color: var(--app-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-fade-out {
+  animation: fadeOut 3s forwards;
+}
+
+.animate-defi-glow {
+  animation: defiGlow 2s ease-in-out infinite;
+}
+
+.animate-defi-bounce {
+  animation: defiBounce 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes defiGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(0, 191, 255, 0.15),
+      0 2px 8px rgba(0, 191, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 6px 30px rgba(0, 191, 255, 0.25),
+      0 4px 16px rgba(0, 191, 255, 0.2);
+  }
+}
+
+@keyframes defiBounce {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Clean wallet styling - no dropdown needed */
