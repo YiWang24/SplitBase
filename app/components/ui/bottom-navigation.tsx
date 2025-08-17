@@ -50,7 +50,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border z-50 shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border z-50 shadow-lg overflow-x-hidden">
       <div className="max-w-md mx-auto px-4">
         <div className="flex justify-around py-3">
           {navItems.map((item) => {

@@ -68,9 +68,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
+    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)] overflow-x-hidden relative">
       {/* Header */}
-      <header className="flex justify-between items-center p-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
+      <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 border-b border-border bg-card/50 backdrop-blur-sm z-50">
         <div className="w-full max-w-md mx-auto flex justify-between items-center">
           {/* Left side - Logo and App Name */}
           <div className="flex items-center space-x-2">
@@ -92,14 +92,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        <div className="w-full max-w-md mx-auto px-4 py-6 flex-1">
-          <main className="min-h-0">{children}</main>
-        </div>
-      </div>
+      <main className="flex-1 w-full overflow-x-hidden pt-20">{children}</main>
 
       {/* Footer */}
-      <footer className="mt-auto pt-6 pb-24 ">
+      <footer className="mt-auto pt-6 pb-32 border-t border-border bg-card/50 backdrop-blur-sm w-full">
         <div className="w-full max-w-md mx-auto px-4 flex justify-center">
           <Button
             variant="ghost"

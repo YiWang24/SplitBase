@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 防止水平滚动 */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 确保 header 固定定位正常工作 */
+body {
+  padding-top: 0;
+}
+
+/* 修复可能的 z-index 问题 */
+.mini-app-theme {
+  position: relative;
+}
+
 /* SplitBase 自定义动画 */
 @keyframes fade-in {
   from {
@@ -101,8 +122,6 @@
 
 /* Body styles are now handled in theme.css */
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -157,9 +176,13 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  .theme {
+    --animate-background-position-spin: background-position-spin 3000ms infinite
+      alternate;
+    --animate-gradient: gradient 8s linear infinite;
+    --animate-aurora: aurora 8s ease-in-out infinite alternate;
+  }
 }
-
-
 
 @layer base {
   * {
@@ -167,5 +190,43 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@theme inline {
+  @keyframes background-position-spin {
+    0% {
+      background-position: top center;
+    }
+    100% {
+      background-position: bottom center;
+    }
+  }
+  @keyframes gradient {
+    to {
+      background-position: var(--bg-size, 300%) 0;
+    }
+  }
+  @keyframes aurora {
+    0% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
+    }
+    25% {
+      background-position: 50% 100%;
+      transform: rotate(5deg) scale(1.1);
+    }
+    50% {
+      background-position: 100% 50%;
+      transform: rotate(-3deg) scale(0.95);
+    }
+    75% {
+      background-position: 50% 0%;
+      transform: rotate(3deg) scale(1.05);
+    }
+    100% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
+    }
   }
 }

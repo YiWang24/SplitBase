@@ -76,14 +76,13 @@ export default function WalletSection() {
 
   return (
     <>
-      <div className="relative">
         <Wallet>
           <ConnectWallet>
             {isConnected ? (
               <Identity
                 address={address}
                 schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
-                className="flex items-center space-x-2 bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
+                className="flex items-center space-x-2 bg-inherit  rounded-lg px-2 py-1"
               >
                 <Avatar className="w-4 h-4 rounded-full" />
                 <Name className="text-inherit text-xs font-medium">
@@ -106,7 +105,6 @@ export default function WalletSection() {
             />
           )}
         </Wallet>
-      </div>
 
       {/* Wallet Modal */}
       <WalletModal isOpen={showModal} onClose={() => setShowModal(false)} />

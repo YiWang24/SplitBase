@@ -32,7 +32,7 @@ export default function SplitBillPage() {
   };
 
   const handleGoHome = () => {
-    router.push("/");
+    router.push("/bills");
   };
 
   // Prevent hydration mismatch
@@ -46,7 +46,7 @@ export default function SplitBillPage() {
       <div className="flex justify-start">
         <Button variant="ghost" size="sm" onClick={handleGoHome}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to Home
+          Back to Bills
         </Button>
       </div>
 

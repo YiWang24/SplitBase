@@ -208,9 +208,9 @@ export default function BillsContent() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 w-full overflow-x-hidden pt-4">
       {/* Header */}
-      <Card className="rounded-none border-x-0 border-t-0 sticky top-0 z-40">
+      <Card className="rounded-none border-x-0 border-t-0">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -225,7 +225,7 @@ export default function BillsContent() {
       </Card>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-4">
+      <div className="max-w-md mx-auto px-4 py-4 w-full overflow-x-hidden">
         <Tabs
           value={activeTab}
           onValueChange={(value) =>
