@@ -30,6 +30,32 @@ export interface Participant {
   transactionHash?: string;
 }
 
+// Friend type for managing contacts
+export interface Friend {
+  id: string;
+  address: string;
+  basename?: string; // .base domain name
+  nickname?: string; // Custom nickname for the friend
+  addedAt: Date;
+  lastUsedAt?: Date;
+  isFavorite?: boolean;
+}
+
+// Input type for adding new friend
+export interface AddFriendInput {
+  address: string;
+  basename?: string;
+  nickname?: string;
+}
+
+// Input type for updating friend
+export interface UpdateFriendInput {
+  id: string;
+  address?: string;
+  nickname?: string;
+  isFavorite?: boolean;
+}
+
 export interface PaymentTransaction {
   id: string;
   billId: string;

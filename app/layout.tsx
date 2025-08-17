@@ -3,6 +3,7 @@ import "@coinbase/onchainkit/styles.css";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import AppLayout from "./components/AppLayout";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -43,7 +44,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="mini-app-theme" suppressHydrationWarning={true}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppLayout>{children}</AppLayout>
+        </Providers>
       </body>
     </html>
   );

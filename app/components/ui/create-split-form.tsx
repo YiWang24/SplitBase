@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Name } from "@coinbase/onchainkit/identity";
-import { Plus, ArrowRight, Minus } from "lucide-react";
+import { Plus, ArrowRight, Minus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CreateSplitBillInput, BASE_PAY_CONFIG } from "@/lib/types";
+import { CreateSplitBillInput, BASE_PAY_CONFIG, Friend } from "@/lib/types";
 import { formatAmount } from "@/lib/split-utils";
+import FriendSelector from "./friend-selector";
 
 interface CreateSplitFormProps {
   onSuccess: (billId: string) => void;
@@ -40,6 +41,8 @@ export default function CreateSplitForm({
     totalAmount: "",
     participantCount: 2,
   });
+  const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
+  const [useFriendSelection, setUseFriendSelection] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -57,7 +60,7 @@ export default function CreateSplitForm({
 
   const calculateAmountPerPerson = () => {
     const total = parseFloat(formData.totalAmount);
-    const count = formData.participantCount;
+    const count = useFriendSelection ? selectedFriends.length + 1 : formData.participantCount;
 
     if (isNaN(total) || count < 1) return "0.00";
 
@@ -88,14 +91,25 @@ export default function CreateSplitForm({
       );
     }
 
-    if (formData.participantCount < 2) {
-      errors.push("At least 2 participants required");
-    }
+    if (useFriendSelection) {
+      if (selectedFriends.length < 1) {
+        errors.push("Please select at least 1 friend");
+      }
+      if (selectedFriends.length + 1 > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
+        errors.push(
+          `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
+        );
+      }
+    } else {
+      if (formData.participantCount < 2) {
+        errors.push("At least 2 participants required");
+      }
 
-    if (formData.participantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
-      errors.push(
-        `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
-      );
+      if (formData.participantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
+        errors.push(
+          `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
+        );
+      }
     }
 
     const amountPerPerson = parseFloat(calculateAmountPerPerson());
@@ -151,6 +165,8 @@ export default function CreateSplitForm({
           totalAmount: "",
           participantCount: 2,
         });
+        setSelectedFriends([]);
+        setUseFriendSelection(false);
       } else {
         onError(result.error || "Failed to create split");
       }
@@ -167,7 +183,7 @@ export default function CreateSplitForm({
     formData.title.trim() &&
     formData.totalAmount &&
     parseFloat(formData.totalAmount) > 0 &&
-    formData.participantCount >= 2;
+    (useFriendSelection ? selectedFriends.length >= 1 : formData.participantCount >= 2);
 
   // Prevent hydration mismatch
   if (!mounted) {
@@ -245,65 +261,109 @@ export default function CreateSplitForm({
             </p>
           </div>
 
-          {/* Participants */}
-          <div className="space-y-2">
-            <Label htmlFor="participantCount">PARTICIPANTS *</Label>
-            <div className="flex items-center space-x-3">
+          {/* Participant Selection Method */}
+          <div className="space-y-3">
+            <Label>PARTICIPANTS *</Label>
+            <div className="flex space-x-2">
               <Button
                 type="button"
-                variant="outline"
+                variant={!useFriendSelection ? "default" : "outline"}
                 size="sm"
-                onClick={() =>
-                  formData.participantCount > 2 &&
-                  handleInputChange(
-                    "participantCount",
-                    formData.participantCount - 1,
-                  )
-                }
-                disabled={formData.participantCount <= 2}
-                className="h-8 w-8 p-0"
+                onClick={() => setUseFriendSelection(false)}
+                className="flex-1"
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="mr-2 h-4 w-4" />
+                Manual Count
               </Button>
-              <Input
-                type="number"
-                id="participantCount"
-                value={formData.participantCount}
-                onChange={(e) =>
-                  handleInputChange(
-                    "participantCount",
-                    parseInt(e.target.value) || 2,
-                  )
-                }
-                min="2"
-                max={BASE_PAY_CONFIG.MAX_PARTICIPANTS}
-                className="w-20 text-center"
-                required
-              />
               <Button
                 type="button"
-                variant="outline"
+                variant={useFriendSelection ? "default" : "outline"}
                 size="sm"
-                onClick={() =>
-                  formData.participantCount <
-                    BASE_PAY_CONFIG.MAX_PARTICIPANTS &&
-                  handleInputChange(
-                    "participantCount",
-                    formData.participantCount + 1,
-                  )
-                }
-                disabled={
-                  formData.participantCount >= BASE_PAY_CONFIG.MAX_PARTICIPANTS
-                }
-                className="h-8 w-8 p-0"
+                onClick={() => setUseFriendSelection(true)}
+                className="flex-1"
               >
-                <Plus className="h-4 w-4" />
+                <Users className="mr-2 h-4 w-4" />
+                Select Friends
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Including you • Max {BASE_PAY_CONFIG.MAX_PARTICIPANTS} people
-            </p>
           </div>
+
+          {/* Manual Participant Count */}
+          {!useFriendSelection && (
+            <div className="space-y-2">
+              <Label htmlFor="participantCount">NUMBER OF PARTICIPANTS</Label>
+              <div className="flex items-center space-x-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    formData.participantCount > 2 &&
+                    handleInputChange(
+                      "participantCount",
+                      formData.participantCount - 1,
+                    )
+                  }
+                  disabled={formData.participantCount <= 2}
+                  className="h-8 w-8 p-0"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="number"
+                  id="participantCount"
+                  value={formData.participantCount}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "participantCount",
+                      parseInt(e.target.value) || 2,
+                    )
+                  }
+                  min="2"
+                  max={BASE_PAY_CONFIG.MAX_PARTICIPANTS}
+                  className="w-20 text-center"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    formData.participantCount <
+                      BASE_PAY_CONFIG.MAX_PARTICIPANTS &&
+                    handleInputChange(
+                      "participantCount",
+                      formData.participantCount + 1,
+                    )
+                  }
+                  disabled={
+                    formData.participantCount >= BASE_PAY_CONFIG.MAX_PARTICIPANTS
+                  }
+                  className="h-8 w-8 p-0"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Including you • Max {BASE_PAY_CONFIG.MAX_PARTICIPANTS} people
+              </p>
+            </div>
+          )}
+
+          {/* Friend Selection */}
+          {useFriendSelection && (
+            <div className="space-y-2">
+              <Label>SELECT FRIENDS</Label>
+              <FriendSelector
+                selectedFriends={selectedFriends}
+                onFriendsChange={setSelectedFriends}
+                maxParticipants={BASE_PAY_CONFIG.MAX_PARTICIPANTS}
+              />
+              <p className="text-xs text-muted-foreground">
+                Including you • {selectedFriends.length + 1} participants
+              </p>
+            </div>
+          )}
 
           {/* Amount Preview */}
           {formData.totalAmount && formData.participantCount && (

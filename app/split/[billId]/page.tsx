@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SplitBillDetail from "@/app/components/ui/split-bill-detail";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Wallet, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, Check, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SplitBillPage() {
   const params = useParams();
+  const router = useRouter();
   const billId = params.billId as string;
   const [mounted, setMounted] = useState(false);
   const [message, setMessage] = useState<{
@@ -31,7 +32,7 @@ export default function SplitBillPage() {
   };
 
   const handleGoHome = () => {
-    window.location.href = "/";
+    router.push("/");
   };
 
   // Prevent hydration mismatch
@@ -40,70 +41,47 @@ export default function SplitBillPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
-      <div className="w-full max-w-md mx-auto px-4 py-3">
-        {/* Navigation Bar */}
-        <header className="flex justify-between items-center mb-4 h-11">
-          {/* Left side - Back button and Logo */}
-          <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={handleGoHome}>
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Back
-            </Button>
-            <div className="flex items-center space-x-2">
-              <Wallet className="h-4 w-4 text-primary" />
-              <span className="text-xs font-bold">SplitBase</span>
-            </div>
-          </div>
-          {/* Center - Page Title */}
-          <h1 className="text-sm font-semibold text-[var(--app-foreground)]">
-            Split Details
-          </h1>
-          <div className="w-16" /> {/* Spacer for centering */}
-        </header>
-
-        {/* Message Alert */}
-        {message && (
-          <Alert
-            className={`mb-4 ${
-              message.type === "success"
-                ? "border-green-200 bg-green-50"
-                : "border-red-200 bg-red-50"
-            }`}
-          >
-            <div className="flex items-start">
-              {message.type === "success" ? (
-                <Check className="h-4 w-4 mt-0.5 mr-2 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 mt-0.5 mr-2 text-red-600" />
-              )}
-              <AlertDescription
-                className={`text-sm ${
-                  message.type === "success" ? "text-green-800" : "text-red-800"
-                }`}
-              >
-                {message.text}
-              </AlertDescription>
-            </div>
-          </Alert>
-        )}
-
-        {/* Main Content */}
-        <main className="flex-1">
-          <SplitBillDetail
-            billId={billId}
-            onSuccess={handleSuccess}
-            onError={handleError}
-          />
-        </main>
-
-        {/* Footer */}
-        <footer className="mt-6 pt-4 text-center">
-          <p className="text-xs text-[var(--app-foreground-muted)]">
-            Powered by Base Pay & OnchainKit
-          </p>
-        </footer>
+    <div className="space-y-6">
+      {/* Back Button */}
+      <div className="flex justify-start">
+        <Button variant="ghost" size="sm" onClick={handleGoHome}>
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to Home
+        </Button>
       </div>
+
+      {/* Message Alert */}
+      {message && (
+        <Alert
+          className={`mb-4 ${
+            message.type === "success"
+              ? "border-green-200 bg-green-50"
+              : "border-red-200 bg-red-50"
+          }`}
+        >
+          <div className="flex items-start">
+            {message.type === "success" ? (
+              <Check className="h-4 w-4 mt-0.5 mr-2 text-green-600" />
+            ) : (
+              <AlertCircle className="h-4 w-4 mt-0.5 mr-2 text-red-600" />
+            )}
+            <AlertDescription
+              className={`text-sm ${
+                message.type === "success" ? "text-green-800" : "text-red-800"
+              }`}
+            >
+              {message.text}
+            </AlertDescription>
+          </div>
+        </Alert>
+      )}
+
+      {/* Main Content */}
+      <SplitBillDetail
+        billId={billId}
+        onSuccess={handleSuccess}
+        onError={handleError}
+      />
     </div>
   );
 }

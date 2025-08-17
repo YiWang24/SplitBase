@@ -14,7 +14,7 @@ import {
   Wallet as WalletIcon,
 } from "lucide-react";
 import Link from "next/link";
-import BottomNavigation from "@/app/components/ui/bottom-navigation";
+
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { Button } from "@/components/ui/button";
 import {
@@ -200,21 +200,9 @@ export default function BillsContent() {
                   Please connect your wallet to view your bills
                 </CardDescription>
               </div>
-              {/* Connect Wallet Button */}
-              <div className="flex justify-center">
-              <Wallet>
-                <ConnectWallet>
-                  <Button className="w-full">
-                    <WalletIcon className="mr-2 h-4 w-4" />
-                    CONNECT NOW
-                  </Button>
-                </ConnectWallet>
-              </Wallet>
-              </div>
             </CardContent>
           </Card>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -324,8 +312,6 @@ export default function BillsContent() {
           </div>
         </Tabs>
       </div>
-
-      <BottomNavigation />
     </div>
   );
 }

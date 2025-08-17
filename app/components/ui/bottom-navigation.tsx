@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Home, Receipt, Plus } from "lucide-react";
+import { Home, Receipt, Plus, Users, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +13,7 @@ export default function BottomNavigation() {
 
   const handleCreateClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push("/?action=create");
+    router.push("/create");
   };
 
   const navItems = [
@@ -30,10 +30,22 @@ export default function BottomNavigation() {
       onClick: undefined,
     },
     {
-      href: "/?action=create",
+      href: "/create",
       icon: Plus,
       label: "Create",
       onClick: handleCreateClick,
+    },
+    {
+      href: "/friends",
+      icon: Users,
+      label: "Friends",
+      onClick: undefined,
+    },
+    {
+      href: "/friends/leaderboard",
+      icon: Trophy,
+      label: "Leaderboard",
+      onClick: undefined,
     },
   ];
 
@@ -50,8 +62,11 @@ export default function BottomNavigation() {
             } else if (item.label === "Bills") {
               isActive = pathname === "/bills";
             } else if (item.label === "Create") {
-              isActive =
-                pathname === "/" && searchParams.get("action") === "create";
+              isActive = pathname === "/create";
+            } else if (item.label === "Friends") {
+              isActive = pathname === "/friends";
+            } else if (item.label === "Leaderboard") {
+              isActive = pathname === "/friends/leaderboard";
             }
 
             if (item.onClick) {

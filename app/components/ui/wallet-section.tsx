@@ -3,11 +3,9 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
-import { Name, Avatar } from "@coinbase/onchainkit/identity";
+import { Identity, Avatar, Name, Badge } from "@coinbase/onchainkit/identity";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
-import { base } from "wagmi/chains";
 import { Wallet as WalletIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import WalletModal from "./wallet-modal";
 
@@ -81,34 +79,23 @@ export default function WalletSection() {
       <div className="relative">
         <Wallet>
           <ConnectWallet>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-              asChild
-            >
-              <div className="flex items-center space-x-2">
-                {isConnected ? (
-                  <>
-                    <Avatar
-                      address={address}
-                      chain={base}
-                      className="w-4 h-4 rounded-full"
-                    />
-                    <Name
-                      address={address}
-                      chain={base}
-                      className="text-inherit text-xs font-medium"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <WalletIcon className="w-4 h-4" />
-                    <span className="text-xs">Connect</span>
-                  </>
-                )}
-              </div>
-            </Button>
+            {isConnected ? (
+              <Identity
+                address={address}
+                schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+                className="flex items-center space-x-2 bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
+              >
+                <Avatar className="w-4 h-4 rounded-full" />
+                <Name className="text-inherit text-xs font-medium">
+                  <Badge tooltip={true} />
+                </Name>
+              </Identity>
+            ) : (
+              <>
+                <WalletIcon className="w-4 h-4" />
+                <span className="text-xs">Connect</span>
+              </>
+            )}
           </ConnectWallet>
 
           {/* Connected wallet click trigger */}

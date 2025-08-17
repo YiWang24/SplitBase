@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { useAccount, useDisconnect } from "wagmi";
 import {
-  Name,
+  Identity,
   Address,
-  Avatar,
   EthBalance,
+  IdentityCard,
 } from "@coinbase/onchainkit/identity";
-import { base } from "wagmi/chains";
+
 import { Copy, ExternalLink, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 interface WalletModalProps {
@@ -64,26 +63,14 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
         {isConnected ? (
           <div className="space-y-6">
-            {/* Avatar and Name */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Avatar
-                  address={address}
-                  chain={base}
-                  className="w-16 h-16 rounded-full border-2 border-primary"
-                />
-              </div>
-              <div className="flex-1">
-                <Name
-                  address={address}
-                  chain={base}
-                  className="text-lg font-semibold text-foreground block"
-                />
-                <Badge variant="secondary" className="mt-1">
-                  Base Network
-                </Badge>
-              </div>
-            </div>
+            {/* Identity Component */}
+
+            <IdentityCard
+              address={address}
+              schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+              className=" space-x-2 bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
+              badgeTooltip={true}
+            />
 
             <Separator />
 
@@ -95,10 +82,13 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
               <CardContent className="pt-0">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <Address
+                    <Identity
                       address={address}
-                      className="text-sm font-mono text-muted-foreground truncate"
-                    />
+                      schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+                      className="text-sm font-mono text-muted-foreground truncate bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
+                    >
+                      <Address/>
+                    </Identity>
                   </div>
                   <Button
                     variant="ghost"
