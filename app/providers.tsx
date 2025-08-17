@@ -20,6 +20,7 @@ export function Providers(props: { children: ReactNode }) {
           display: "modal",
           preference: "smartWalletOnly",
         },
+        
       }}
     >
       {props.children}

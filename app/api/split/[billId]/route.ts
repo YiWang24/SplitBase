@@ -12,12 +12,12 @@ import {
 } from "@/lib/types";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     billId: string;
-  };
+  }>;
 }
 
-// 获取分账详情
+// Get split bill details
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const resolvedParams = await params;
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "分账ID不能为空",
+          error: "Split bill ID cannot be empty",
         },
         { status: 400 },
       );
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "分账不存在",
+          error: "Split bill not found",
         },
         { status: 404 },
       );
@@ -54,14 +54,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json<ApiResponse<null>>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "获取分账失败",
+        error:
+          error instanceof Error ? error.message : "Failed to get split bill",
       },
       { status: 500 },
     );
   }
 }
 
-// 更新分账 (加入参与者或更新支付状态)
+// Update split bill (join participants or update payment status)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const resolvedParams = await params;
@@ -73,7 +74,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "分账ID不能为空",
+          error: "Split bill ID cannot be empty",
         },
         { status: 400 },
       );
@@ -84,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "分账不存在",
+          error: "Split bill not found",
         },
         { status: 404 },
       );
@@ -93,7 +94,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     let updatedBill = bill;
 
     if (action === "join") {
-      // 加入分账
+      // Join split bill
       const joinData: JoinSplitBillInput = body;
       updatedBill = addParticipant(
         bill,
@@ -102,13 +103,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         joinData.displayName,
       );
     } else if (action === "payment") {
-      // 更新支付状态
+      // Update payment status
       const paymentData: PaymentStatusUpdate = body;
       if (!paymentData.transactionHash) {
         return NextResponse.json<ApiResponse<null>>(
           {
             success: false,
-            error: "交易哈希不能为空",
+            error: "Transaction hash cannot be empty",
           },
           { status: 400 },
         );
@@ -124,33 +125,39 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "无效的操作类型",
+          error: "Invalid operation type",
         },
         { status: 400 },
       );
     }
 
-    // 保存更新
+    // Save updates
     await updateSplitBill(updatedBill);
 
     return NextResponse.json<ApiResponse<typeof updatedBill>>({
       success: true,
       data: updatedBill,
-      message: action === "join" ? "成功加入分账" : "支付状态更新成功",
+      message:
+        action === "join"
+          ? "Successfully joined split bill"
+          : "Payment status updated successfully",
     });
   } catch (error) {
     console.error("Error updating split bill:", error);
     return NextResponse.json<ApiResponse<null>>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "更新分账失败",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to update split bill",
       },
       { status: 500 },
     );
   }
 }
 
-// 删除分账
+// Delete split bill
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const resolvedParams = await params;
@@ -160,7 +167,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json<ApiResponse<null>>(
         {
           success: false,
-          error: "分账ID不能为空",
+          error: "Split bill ID cannot be empty",
         },
         { status: 400 },
       );
@@ -170,14 +177,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json<ApiResponse<null>>({
       success: true,
-      message: "分账删除成功",
+      message: "Split bill deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting split bill:", error);
     return NextResponse.json<ApiResponse<null>>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "删除分账失败",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete split bill",
       },
       { status: 500 },
     );

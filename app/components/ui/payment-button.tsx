@@ -16,12 +16,15 @@ import {
   TransactionStatus,
 } from "@coinbase/onchainkit/transaction";
 import { useNotification } from "@coinbase/onchainkit/minikit";
+import { AlertCircle, Wallet, CreditCard } from "lucide-react";
 import { BASE_PAY_CONFIG } from "@/lib/types";
 import { usdcToWei } from "@/lib/split-utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PaymentButtonProps {
   recipientAddress: string;
-  amount: string; // USDC 金额
+  amount: string; // USDC amount
   onSuccess: (txHash: string) => void;
   onError: (error: string) => void;
 }
@@ -35,7 +38,7 @@ export default function PaymentButton({
   const { address } = useAccount();
   const sendNotification = useNotification();
 
-  // 构建 USDC 转账交易
+  // Build USDC transfer transaction
   const calls = useMemo(() => {
     if (!address || !recipientAddress || !amount) {
       return [];
@@ -44,7 +47,7 @@ export default function PaymentButton({
     try {
       const amountInWei = usdcToWei(amount);
 
-      // USDC ERC20 转账调用数据
+      // USDC ERC20 transfer call data
       // transfer(address to, uint256 amount)
       const transferFunctionSelector = "0xa9059cbb";
       const recipientAddressPadded = recipientAddress
@@ -58,17 +61,17 @@ export default function PaymentButton({
         {
           to: BASE_PAY_CONFIG.USDC_CONTRACT_ADDRESS as `0x${string}`,
           data: transferData,
-          value: BigInt(0), // ERC20 转账不需要发送 ETH
+          value: BigInt(0), // ERC20 transfer doesn't need to send ETH
         },
       ];
     } catch (error) {
       console.error("Error building transaction calls:", error);
-      onError("构建交易数据失败");
+      onError("Failed to build transaction data");
       return [];
     }
   }, [address, recipientAddress, amount, onError]);
 
-  // 处理交易成功
+  // Handle transaction success
   const handleSuccess = useCallback(
     async (response: TransactionResponse) => {
       try {
@@ -76,39 +79,39 @@ export default function PaymentButton({
 
         console.log(`Payment successful: ${transactionHash}`);
 
-        // 发送通知
+        // Send notification
         await sendNotification({
-          title: "支付成功！",
-          body: `您已成功支付 ${amount} USDC`,
+          title: "Payment Successful!",
+          body: `You have successfully paid ${amount} USDC`,
         });
 
-        // 调用成功回调
+        // Call success callback
         onSuccess(transactionHash);
       } catch (error) {
         console.error("Error handling payment success:", error);
-        onError("支付成功但状态更新失败");
+        onError("Payment successful but status update failed");
       }
     },
     [amount, onSuccess, onError, sendNotification],
   );
 
-  // 处理交易错误
+  // Handle transaction error
   const handleError = useCallback(
     (error: TransactionError) => {
       console.error("Payment transaction failed:", error);
 
-      let errorMessage = "支付失败";
+      let errorMessage = "Payment failed";
 
-      // 根据错误类型提供更友好的错误信息
+      // Provide more friendly error messages based on error type
       if (error.message) {
         if (error.message.includes("insufficient funds")) {
-          errorMessage = "USDC 余额不足";
+          errorMessage = "Insufficient USDC balance";
         } else if (error.message.includes("user rejected")) {
-          errorMessage = "用户取消了交易";
+          errorMessage = "User canceled the transaction";
         } else if (error.message.includes("gas")) {
-          errorMessage = "Gas 费用不足";
+          errorMessage = "Insufficient gas fees";
         } else {
-          errorMessage = `支付失败: ${error.message}`;
+          errorMessage = `Payment failed: ${error.message}`;
         }
       }
 
@@ -119,17 +122,21 @@ export default function PaymentButton({
 
   if (!address) {
     return (
-      <div className="text-center py-2">
-        <p className="text-yellow-500 text-sm">请连接钱包以进行支付</p>
-      </div>
+      <Alert>
+        <Wallet className="h-4 w-4" />
+        <AlertDescription>
+          Please connect your wallet to make payment
+        </AlertDescription>
+      </Alert>
     );
   }
 
   if (calls.length === 0) {
     return (
-      <div className="text-center py-2">
-        <p className="text-red-500 text-sm">无法构建支付交易</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>Unable to build payment transaction</AlertDescription>
+      </Alert>
     );
   }
 
@@ -141,8 +148,8 @@ export default function PaymentButton({
         onError={handleError}
       >
         <TransactionButton
-          className="w-full bg-[var(--app-accent)] hover:bg-[var(--app-accent-hover)] text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          text={`支付 ${amount} USDC`}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 px-4 rounded-lg transition-colors"
+          text={`Pay ${amount} USDC`}
         />
 
         <TransactionStatus>
@@ -157,12 +164,19 @@ export default function PaymentButton({
         </TransactionToast>
       </Transaction>
 
-      {/* 支付说明 */}
-      <div className="text-xs text-[var(--app-foreground-muted)] space-y-1">
-        <p>• 支付将通过 Base Pay (USDC) 完成</p>
-        <p>• 请确保您的钱包有足够的 USDC 和少量 ETH 作为 Gas 费</p>
-        <p>• 支付完成后将自动更新状态</p>
-      </div>
+      {/* Payment Instructions */}
+      <Card className="bg-muted/50">
+        <CardContent className="pt-4">
+          <div className="text-xs text-muted-foreground space-y-1">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-3 w-3" />
+              <span>Payment will be completed via Base Pay (USDC)</span>
+            </div>
+            <p>• Ensure you have sufficient USDC and ETH for gas fees</p>
+            <p>• Status will update automatically after payment</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

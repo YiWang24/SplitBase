@@ -7,21 +7,21 @@ import {
 } from "./types";
 
 /**
- * 生成唯一的分账 ID
+ * Generate unique split bill ID
  */
 export function generateBillId(): string {
   return `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
- * 生成唯一的参与者 ID
+ * Generate unique participant ID
  */
 export function generateParticipantId(): string {
   return `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
- * 计算每人应付金额
+ * Calculate amount per person
  */
 export function calculateAmountPerPerson(
   totalAmount: string,
@@ -29,11 +29,11 @@ export function calculateAmountPerPerson(
 ): string {
   const total = parseFloat(totalAmount);
   const perPerson = total / participantCount;
-  return perPerson.toFixed(6); // USDC 6位小数
+  return perPerson.toFixed(6); // USDC 6 decimal places
 }
 
 /**
- * 验证分账输入数据
+ * Validate split bill input data
  */
 export function validateSplitBillInput(input: CreateSplitBillInput): {
   isValid: boolean;
@@ -41,50 +41,56 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
 } {
   const errors: string[] = [];
 
-  // 验证标题
+  // Validate title
   if (!input.title || input.title.trim().length === 0) {
-    errors.push("标题不能为空");
+    errors.push("Title cannot be empty");
   }
 
   if (input.title && input.title.length > 100) {
-    errors.push("标题不能超过100个字符");
+    errors.push("Title cannot exceed 100 characters");
   }
 
-  // 验证总金额
+  // Validate total amount
   const totalAmount = parseFloat(input.totalAmount);
   if (isNaN(totalAmount) || totalAmount <= 0) {
-    errors.push("总金额必须是有效的正数");
+    errors.push("Total amount must be a valid positive number");
   }
 
   if (totalAmount < parseFloat(BASE_PAY_CONFIG.MIN_AMOUNT)) {
-    errors.push(`总金额不能少于 ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`);
+    errors.push(
+      `Total amount cannot be less than ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`,
+    );
   }
 
   if (totalAmount > parseFloat(BASE_PAY_CONFIG.MAX_AMOUNT)) {
-    errors.push(`总金额不能超过 ${BASE_PAY_CONFIG.MAX_AMOUNT} USDC`);
+    errors.push(
+      `Total amount cannot exceed ${BASE_PAY_CONFIG.MAX_AMOUNT} USDC`,
+    );
   }
 
-  // 验证参与人数
+  // Validate participant count
   if (!Number.isInteger(input.participantCount) || input.participantCount < 2) {
-    errors.push("参与人数至少为2人");
+    errors.push("At least 2 participants required");
   }
 
   if (input.participantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
-    errors.push(`参与人数不能超过 ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} 人`);
+    errors.push(
+      `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
+    );
   }
 
-  // 验证创建者地址
+  // Validate creator address
   if (!input.creatorAddress || !isValidEthereumAddress(input.creatorAddress)) {
-    errors.push("创建者地址无效");
+    errors.push("Invalid creator address");
   }
 
-  // 验证每人金额是否合理
+  // Validate if amount per person is reasonable
   const amountPerPerson = parseFloat(
     calculateAmountPerPerson(input.totalAmount, input.participantCount),
   );
   if (amountPerPerson < parseFloat(BASE_PAY_CONFIG.MIN_AMOUNT)) {
     errors.push(
-      `每人金额 ${amountPerPerson.toFixed(6)} USDC 低于最小限额 ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`,
+      `Amount per person ${amountPerPerson.toFixed(6)} USDC is below minimum limit ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`,
     );
   }
 

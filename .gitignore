@@ -4,12 +4,12 @@
 /node_modules
 /.pnp
 .pnp.js
-.yarn/install-state.gz
 .yarn/cache
-.yarn/install-state.gz
-.yarn/install-state.gz
-.yarn/install-state.gz
+
+# testing
 /coverage
+
+# history
 .history
 # next.js
 /.next/

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import SplitBillDetail from "@/app/components/SplitBillDetail";
-import { Button } from "@/app/components/DemoComponents";
-import { Icon } from "@/app/components/DemoComponents";
+import SplitBillDetail from "@/app/components/ui/split-bill-detail";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Wallet, Check, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SplitBillPage() {
   const params = useParams();
@@ -45,24 +46,13 @@ export default function SplitBillPage() {
         <header className="flex justify-between items-center mb-4 h-11">
           {/* Left side - Back button and Logo */}
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoHome}
-              icon={
-                <Icon name="arrow-right" size="sm" className="rotate-180" />
-              }
-            >
+            <Button variant="ghost" size="sm" onClick={handleGoHome}>
+              <ArrowLeft className="mr-1 h-4 w-4" />
               Back
             </Button>
             <div className="flex items-center space-x-2">
-              <Icon
-                name="wallet"
-                className="text-[var(--app-accent)] text-base"
-              />
-              <span className="text-xs font-bold text-[var(--app-foreground)]">
-                SplitBase
-              </span>
+              <Wallet className="h-4 w-4 text-primary" />
+              <span className="text-xs font-bold">SplitBase</span>
             </div>
           </div>
           {/* Center - Page Title */}
@@ -72,29 +62,33 @@ export default function SplitBillPage() {
           <div className="w-16" /> {/* Spacer for centering */}
         </header>
 
-        {/* 消息提示 */}
+        {/* Message Alert */}
         {message && (
-          <div
-            className={`mb-4 p-3 rounded-lg border ${
+          <Alert
+            className={`mb-4 ${
               message.type === "success"
-                ? "bg-green-50 border-green-200 text-green-800"
-                : "bg-red-50 border-red-200 text-red-800"
+                ? "border-green-200 bg-green-50"
+                : "border-red-200 bg-red-50"
             }`}
           >
             <div className="flex items-start">
-              <Icon
-                name={message.type === "success" ? "check" : "star"}
-                size="sm"
-                className={`mt-0.5 mr-2 ${
-                  message.type === "success" ? "text-green-600" : "text-red-600"
+              {message.type === "success" ? (
+                <Check className="h-4 w-4 mt-0.5 mr-2 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 mt-0.5 mr-2 text-red-600" />
+              )}
+              <AlertDescription
+                className={`text-sm ${
+                  message.type === "success" ? "text-green-800" : "text-red-800"
                 }`}
-              />
-              <span className="text-sm">{message.text}</span>
+              >
+                {message.text}
+              </AlertDescription>
             </div>
-          </div>
+          </Alert>
         )}
 
-        {/* 主要内容 */}
+        {/* Main Content */}
         <main className="flex-1">
           <SplitBillDetail
             billId={billId}
@@ -103,7 +97,7 @@ export default function SplitBillPage() {
           />
         </main>
 
-        {/* 页脚 */}
+        {/* Footer */}
         <footer className="mt-6 pt-4 text-center">
           <p className="text-xs text-[var(--app-foreground-muted)]">
             Powered by Base Pay & OnchainKit

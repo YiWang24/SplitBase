@@ -6,7 +6,10 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { Name, Avatar } from "@coinbase/onchainkit/identity";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { base } from "wagmi/chains";
-import WalletModal from "./WalletModal";
+import { Wallet as WalletIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import WalletModal from "./wallet-modal";
 
 export default function WalletSection() {
   const [mounted, setMounted] = useState(false);
@@ -14,7 +17,7 @@ export default function WalletSection() {
   const { isConnected, address, isConnecting, isReconnecting } = useAccount();
   const { isFrameReady, context } = useMiniKit();
 
-  // 检测是否在MiniKit环境中
+  // Detect if in MiniKit environment
   const isMiniKitEnvironment = Boolean(context?.client);
 
   useEffect(() => {
@@ -51,8 +54,8 @@ export default function WalletSection() {
   if (!mounted) {
     return (
       <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 bg-[var(--app-gray)] rounded-full animate-pulse"></div>
-        <div className="w-16 h-4 bg-[var(--app-gray)] rounded animate-pulse"></div>
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <Skeleton className="h-4 w-16" />
       </div>
     );
   }
@@ -61,8 +64,8 @@ export default function WalletSection() {
   if (isConnecting || isReconnecting) {
     return (
       <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 bg-[var(--app-accent)] rounded-full animate-pulse"></div>
-        <div className="text-xs text-[var(--app-accent)]">Connecting...</div>
+        <div className="w-6 h-6 bg-primary rounded-full animate-pulse"></div>
+        <div className="text-xs text-primary">Connecting...</div>
       </div>
     );
   }
@@ -78,18 +81,34 @@ export default function WalletSection() {
       <div className="relative">
         <Wallet>
           <ConnectWallet>
-            <div className="flex items-center space-x-2">
-              <Avatar
-                address={address}
-                chain={base}
-                className="w-6 h-6 rounded-full"
-              />
-              <Name
-                address={address}
-                chain={base}
-                className="text-inherit text-xs font-medium"
-              />
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+              asChild
+            >
+              <div className="flex items-center space-x-2">
+                {isConnected ? (
+                  <>
+                    <Avatar
+                      address={address}
+                      chain={base}
+                      className="w-4 h-4 rounded-full"
+                    />
+                    <Name
+                      address={address}
+                      chain={base}
+                      className="text-inherit text-xs font-medium"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <WalletIcon className="w-4 h-4" />
+                    <span className="text-xs">Connect</span>
+                  </>
+                )}
+              </div>
+            </Button>
           </ConnectWallet>
 
           {/* Connected wallet click trigger */}

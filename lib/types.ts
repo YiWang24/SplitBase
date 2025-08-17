@@ -1,13 +1,13 @@
-// 分账应用的核心类型定义
+// Core type definitions for split bill application
 
 export interface SplitBill {
   id: string;
   title: string;
   description?: string;
-  totalAmount: string; // 使用字符串存储精确金额 (USDC)
+  totalAmount: string; // Use string to store precise amount (USDC)
   currency: "USDC";
   participantCount: number;
-  amountPerPerson: string; // 计算得出的每人金额
+  amountPerPerson: string; // Calculated amount per person
   creatorAddress: string;
   creatorBasename?: string;
   createdAt: Date;
@@ -16,15 +16,15 @@ export interface SplitBill {
   participants: Participant[];
   shareUrl?: string;
   qrCodeUrl?: string;
-  nftReceiptId?: string; // NFT 收据 ID
+  nftReceiptId?: string; // NFT receipt ID
 }
 
 export interface Participant {
   id: string;
   address: string;
-  basename?: string; // .base 域名
+  basename?: string; // .base domain name
   displayName?: string;
-  amount: string; // 应付金额
+  amount: string; // Amount to pay
   status: "pending" | "paid" | "confirmed";
   paidAt?: Date;
   transactionHash?: string;
@@ -42,7 +42,7 @@ export interface PaymentTransaction {
   confirmedAt?: Date;
 }
 
-// 用于创建新分账的输入类型
+// Input type for creating new split bill
 export interface CreateSplitBillInput {
   title: string;
   description?: string;
@@ -52,7 +52,7 @@ export interface CreateSplitBillInput {
   creatorBasename?: string;
 }
 
-// 用于加入分账的输入类型
+// Input type for joining split bill
 export interface JoinSplitBillInput {
   billId: string;
   participantAddress: string;
@@ -60,7 +60,7 @@ export interface JoinSplitBillInput {
   displayName?: string;
 }
 
-// 支付状态更新类型
+// Payment status update type
 export interface PaymentStatusUpdate {
   participantId: string;
   status: "paid" | "confirmed";
@@ -68,7 +68,7 @@ export interface PaymentStatusUpdate {
   paidAt?: Date;
 }
 
-// API 响应类型
+// API response type
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -76,7 +76,7 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-// 分账统计信息
+// Split bill statistics
 export interface SplitBillStats {
   totalPaid: string;
   totalPending: string;
@@ -85,7 +85,7 @@ export interface SplitBillStats {
   completionRate: number; // 0-100
 }
 
-// Mini App 状态管理
+// Mini App state management
 export interface AppState {
   currentBill?: SplitBill;
   userParticipation?: Participant;
@@ -93,31 +93,31 @@ export interface AppState {
   error?: string;
 }
 
-// 通知类型
+// Notification type
 export interface NotificationPayload {
   type: "payment_received" | "bill_completed" | "payment_reminder";
   billId: string;
   title: string;
   body: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
-// OnchainKit 交易相关类型
+// OnchainKit transaction related types
 export interface USDCTransferCall {
-  to: string; // 接收方地址
-  value: bigint; // USDC 金额 (以 wei 为单位)
-  data: `0x${string}`; // 转账调用数据
+  to: string; // Recipient address
+  value: bigint; // USDC amount (in wei units)
+  data: `0x${string}`; // Transfer call data
 }
 
-// Base Pay 配置
+// Base Pay configuration
 export const BASE_PAY_CONFIG = {
-  USDC_CONTRACT_ADDRESS: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base 主网 USDC
-  DECIMALS: 6, // USDC 小数位数
-  MIN_AMOUNT: "0.01", // 最小分账金额
-  MAX_AMOUNT: "10000", // 最大分账金额
-  MAX_PARTICIPANTS: 50, // 最大参与人数
+  USDC_CONTRACT_ADDRESS: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base mainnet USDC
+  DECIMALS: 6, // USDC decimal places
+  MIN_AMOUNT: "0.01", // Minimum split amount
+  MAX_AMOUNT: "10000", // Maximum split amount
+  MAX_PARTICIPANTS: 50, // Maximum participants
 } as const;
 
-// 工具函数类型
+// Utility function types
 export type AmountFormatter = (amount: string) => string;
 export type AddressFormatter = (address: string) => string;

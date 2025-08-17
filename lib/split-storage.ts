@@ -1,9 +1,9 @@
-import { SplitBill, Participant, PaymentTransaction } from "./types";
+import { SplitBill, PaymentTransaction } from "./types";
 import { redis } from "./redis";
 
 /**
- * 分账数据存储管理
- * 使用 Redis 作为临时存储，实际项目中可能需要持久化数据库
+ * Split bill data storage management
+ * Uses Redis as temporary storage, actual projects may need persistent database
  */
 
 const BILL_PREFIX = "split_bill:";
@@ -11,27 +11,37 @@ const USER_BILLS_PREFIX = "user_bills:";
 const TRANSACTION_PREFIX = "transaction:";
 
 /**
- * 保存分账数据
+ * Save split bill data
  */
 export async function saveSplitBill(bill: SplitBill): Promise<void> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    throw new Error("Redis connection unavailable");
+  }
+
   try {
     const key = `${BILL_PREFIX}${bill.id}`;
-    await redis.setex(key, 7 * 24 * 60 * 60, JSON.stringify(bill)); // 7天过期
+    await redis.setex(key, 7 * 24 * 60 * 60, JSON.stringify(bill)); // Expires in 7 days
 
-    // 同时更新创建者的分账列表
+    // Also update creator's split bill list
     await addBillToUserList(bill.creatorAddress, bill.id);
 
     console.log(`Saved split bill: ${bill.id}`);
   } catch (error) {
     console.error("Error saving split bill:", error);
-    throw new Error("保存分账数据失败");
+    throw new Error("Failed to save split bill data");
   }
 }
 
 /**
- * 获取分账数据
+ * Get split bill data
  */
 export async function getSplitBill(billId: string): Promise<SplitBill | null> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    return null;
+  }
+
   try {
     const key = `${BILL_PREFIX}${billId}`;
     const data = await redis.get(key);
@@ -40,9 +50,20 @@ export async function getSplitBill(billId: string): Promise<SplitBill | null> {
       return null;
     }
 
-    const bill = JSON.parse(data) as SplitBill;
+    let bill: SplitBill;
 
-    // 转换日期字符串为 Date 对象
+    // Handle both string and object data from Redis
+    if (typeof data === "string") {
+      bill = JSON.parse(data) as SplitBill;
+    } else if (typeof data === "object" && data !== null) {
+      // Redis client already parsed the JSON, use it directly
+      bill = data as SplitBill;
+    } else {
+      console.error("Redis returned invalid data type:", typeof data, data);
+      return null;
+    }
+
+    // Convert date strings to Date objects
     bill.createdAt = new Date(bill.createdAt);
     bill.updatedAt = new Date(bill.updatedAt);
     bill.participants = bill.participants.map((p) => ({
@@ -58,12 +79,12 @@ export async function getSplitBill(billId: string): Promise<SplitBill | null> {
 }
 
 /**
- * 更新分账数据
+ * Update split bill data
  */
 export async function updateSplitBill(bill: SplitBill): Promise<void> {
   const existingBill = await getSplitBill(bill.id);
   if (!existingBill) {
-    throw new Error("分账不存在");
+    throw new Error("Split bill does not exist");
   }
 
   bill.updatedAt = new Date();
@@ -71,9 +92,14 @@ export async function updateSplitBill(bill: SplitBill): Promise<void> {
 }
 
 /**
- * 删除分账数据
+ * Delete split bill data
  */
 export async function deleteSplitBill(billId: string): Promise<void> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    throw new Error("Redis 连接不可用");
+  }
+
   try {
     const bill = await getSplitBill(billId);
     if (bill) {
@@ -98,6 +124,11 @@ async function addBillToUserList(
   userAddress: string,
   billId: string,
 ): Promise<void> {
+  if (!redis) {
+    console.error("Redis connection not available for addBillToUserList");
+    return;
+  }
+
   try {
     const key = `${USER_BILLS_PREFIX}${userAddress.toLowerCase()}`;
     await redis.sadd(key, billId);
@@ -114,6 +145,11 @@ async function removeBillFromUserList(
   userAddress: string,
   billId: string,
 ): Promise<void> {
+  if (!redis) {
+    console.error("Redis connection not available for removeBillFromUserList");
+    return;
+  }
+
   try {
     const key = `${USER_BILLS_PREFIX}${userAddress.toLowerCase()}`;
     await redis.srem(key, billId);
@@ -128,6 +164,11 @@ async function removeBillFromUserList(
 export async function getUserSplitBills(
   userAddress: string,
 ): Promise<SplitBill[]> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    return [];
+  }
+
   try {
     const key = `${USER_BILLS_PREFIX}${userAddress.toLowerCase()}`;
     const billIds = await redis.smembers(key);
@@ -154,6 +195,11 @@ export async function getUserSplitBills(
 export async function savePaymentTransaction(
   transaction: PaymentTransaction,
 ): Promise<void> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    throw new Error("Redis 连接不可用");
+  }
+
   try {
     const key = `${TRANSACTION_PREFIX}${transaction.id}`;
     await redis.setex(key, 30 * 24 * 60 * 60, JSON.stringify(transaction)); // 30天过期
@@ -171,6 +217,11 @@ export async function savePaymentTransaction(
 export async function getPaymentTransaction(
   transactionId: string,
 ): Promise<PaymentTransaction | null> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    return null;
+  }
+
   try {
     const key = `${TRANSACTION_PREFIX}${transactionId}`;
     const data = await redis.get(key);
@@ -179,9 +230,24 @@ export async function getPaymentTransaction(
       return null;
     }
 
-    const transaction = JSON.parse(data) as PaymentTransaction;
+    let transaction: PaymentTransaction;
 
-    // 转换日期字符串为 Date 对象
+    // Handle both string and object data from Redis
+    if (typeof data === "string") {
+      transaction = JSON.parse(data) as PaymentTransaction;
+    } else if (typeof data === "object" && data !== null) {
+      // Redis client already parsed the JSON, use it directly
+      transaction = data as PaymentTransaction;
+    } else {
+      console.error(
+        "Redis returned invalid data type for transaction:",
+        typeof data,
+        data,
+      );
+      return null;
+    }
+
+    // Convert date strings to Date objects
     transaction.createdAt = new Date(transaction.createdAt);
     if (transaction.confirmedAt) {
       transaction.confirmedAt = new Date(transaction.confirmedAt);
@@ -226,6 +292,11 @@ export async function updatePaymentTransactionStatus(
 export async function getBillTransactions(
   billId: string,
 ): Promise<PaymentTransaction[]> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    return [];
+  }
+
   try {
     // 这是一个简化实现，实际项目中可能需要更复杂的索引
     // 目前通过扫描所有交易记录来查找相关交易
@@ -236,7 +307,15 @@ export async function getBillTransactions(
     for (const key of keys) {
       const data = await redis.get(key);
       if (data) {
-        const transaction = JSON.parse(data) as PaymentTransaction;
+        let transaction: PaymentTransaction;
+
+        if (typeof data === "string") {
+          transaction = JSON.parse(data) as PaymentTransaction;
+        } else if (typeof data === "object" && data !== null) {
+          transaction = data as PaymentTransaction;
+        } else {
+          continue; // Skip invalid data
+        }
         if (transaction.billId === billId) {
           transaction.createdAt = new Date(transaction.createdAt);
           if (transaction.confirmedAt) {
@@ -277,6 +356,16 @@ export async function getStats(): Promise<{
   completedBills: number;
   totalTransactions: number;
 }> {
+  if (!redis) {
+    console.error("Redis connection not available");
+    return {
+      totalBills: 0,
+      activeBills: 0,
+      completedBills: 0,
+      totalTransactions: 0,
+    };
+  }
+
   try {
     const billPattern = `${BILL_PREFIX}*`;
     const billKeys = await redis.keys(billPattern);
@@ -287,7 +376,15 @@ export async function getStats(): Promise<{
     for (const key of billKeys) {
       const data = await redis.get(key);
       if (data) {
-        const bill = JSON.parse(data) as SplitBill;
+        let bill: SplitBill;
+
+        if (typeof data === "string") {
+          bill = JSON.parse(data) as SplitBill;
+        } else if (typeof data === "object" && data !== null) {
+          bill = data as SplitBill;
+        } else {
+          continue; // Skip invalid data
+        }
         if (bill.status === "active") {
           activeBills++;
         } else if (bill.status === "completed") {

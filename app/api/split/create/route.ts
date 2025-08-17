@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const input: CreateSplitBillInput = body;
 
-    // 验证输入数据
+    // Validate input data
     const validation = validateSplitBillInput(input);
     if (!validation.isValid) {
       return NextResponse.json<ApiResponse<null>>(
@@ -20,23 +20,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 创建分账
+    // Create split bill
     const bill = createSplitBill(input);
 
-    // 保存到存储
+    // Save to storage
     await saveSplitBill(bill);
 
     return NextResponse.json<ApiResponse<typeof bill>>({
       success: true,
       data: bill,
-      message: "分账创建成功",
+      message: "Split bill created successfully",
     });
   } catch (error) {
     console.error("Error creating split bill:", error);
     return NextResponse.json<ApiResponse<null>>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "创建分账失败",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to create split bill",
       },
       { status: 500 },
     );
