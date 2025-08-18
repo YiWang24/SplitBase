@@ -6,7 +6,7 @@ import {
   useOpenUrl,
 } from "@coinbase/onchainkit/minikit";
 import WalletSection from "./ui/wallet-section";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Wallet, Check } from "lucide-react";
 import BottomNavigation from "./ui/bottom-navigation";
@@ -30,10 +30,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   }, [setFrameReady, isFrameReady]);
 
-  const handleAddFrame = async () => {
+  const handleAddFrame = useCallback(async () => {
     const frameAdded = await addFrame();
     setFrameAdded(Boolean(frameAdded));
-  };
+  }, [addFrame]);
 
   const saveFrameButton = useMemo(() => {
     if (context && !context.client.added) {

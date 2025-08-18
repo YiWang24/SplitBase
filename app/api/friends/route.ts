@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body: UpdateFriendInput = await request.json();
-    const { id, nickname, isFavorite } = body;
+    const { id } = body;
 
     if (!id) {
       return NextResponse.json<ApiResponse<Friend>>(

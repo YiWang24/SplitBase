@@ -24,7 +24,6 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
-  Trophy,
 } from "lucide-react";
 import { Friend, AddFriendInput } from "@/lib/types";
 import {
@@ -38,7 +37,6 @@ import {
   isValidEthereumAddress,
 } from "@/lib/friend-utils";
 import { Avatar } from "@coinbase/onchainkit/identity";
-import { useRouter } from "next/navigation";
 
 // FriendModal Component
 interface FriendModalProps {
@@ -229,7 +227,6 @@ export default function FriendsPage() {
     message: string;
   } | null>(null);
   const [deletingFriendId, setDeletingFriendId] = useState<string | null>(null);
-  const router = useRouter();
 
   // Load friends from localStorage on mount
   useEffect(() => {
@@ -430,7 +427,6 @@ export default function FriendsPage() {
           />
         </div>
       </div>
-
 
       {/* Add Friend Button */}
       <div className="mb-6">

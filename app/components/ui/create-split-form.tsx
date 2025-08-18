@@ -60,7 +60,9 @@ export default function CreateSplitForm({
 
   const calculateAmountPerPerson = () => {
     const total = parseFloat(formData.totalAmount);
-    const count = useFriendSelection ? selectedFriends.length + 1 : formData.participantCount;
+    const count = useFriendSelection
+      ? selectedFriends.length + 1
+      : formData.participantCount;
 
     if (isNaN(total) || count < 1) return "0.00";
 
@@ -144,6 +146,8 @@ export default function CreateSplitForm({
         creatorAddress: address,
         // TODO: Get user's .base domain from Basename service
         creatorBasename: undefined,
+        // 添加选中的好友信息
+        selectedFriends: useFriendSelection ? selectedFriends : undefined,
       };
 
       const response = await fetch("/api/split/create", {
@@ -183,7 +187,9 @@ export default function CreateSplitForm({
     formData.title.trim() &&
     formData.totalAmount &&
     parseFloat(formData.totalAmount) > 0 &&
-    (useFriendSelection ? selectedFriends.length >= 1 : formData.participantCount >= 2);
+    (useFriendSelection
+      ? selectedFriends.length >= 1
+      : formData.participantCount >= 2);
 
   // Prevent hydration mismatch
   if (!mounted) {
@@ -337,7 +343,8 @@ export default function CreateSplitForm({
                     )
                   }
                   disabled={
-                    formData.participantCount >= BASE_PAY_CONFIG.MAX_PARTICIPANTS
+                    formData.participantCount >=
+                    BASE_PAY_CONFIG.MAX_PARTICIPANTS
                   }
                   className="h-8 w-8 p-0"
                 >

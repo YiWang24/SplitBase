@@ -26,10 +26,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 
-import { Name, Avatar as OnchainAvatar } from "@coinbase/onchainkit/identity";
+import { Avatar as OnchainAvatar } from "@coinbase/onchainkit/identity";
 import PaymentButton from "./payment-button";
 import ShareModal from "./share-modal";
 import CompletionModal from "./completion-modal";
@@ -298,37 +297,6 @@ export default function SplitBillDetail({
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Creator */}
-          <div className="p-4 bg-primary/5 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <OnchainAvatar
-                  address={bill.creatorAddress as `0x${string}`}
-                  className="w-8 h-8"
-                />
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <Name
-                      address={bill.creatorAddress as `0x${string}`}
-                      className="font-medium text-foreground"
-                    />
-                    <Badge variant="default" className="text-xs">
-                      Creator
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatAddress(bill.creatorAddress)}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-foreground">Recipient</p>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
           {/* Participants */}
           <div className="space-y-4">
             {bill.participants.map((participant: Participant) => (
@@ -344,6 +312,14 @@ export default function SplitBillDetail({
                         <span className="font-medium text-foreground">
                           {participant.displayName}
                         </span>
+                        {/* Show Creator badge for creator */}
+                        {participant.address.toLowerCase() ===
+                          bill.creatorAddress.toLowerCase() && (
+                          <Badge variant="default" className="text-xs">
+                            Creator
+                          </Badge>
+                        )}
+                        {/* Show You badge for current user */}
                         {participant.address.toLowerCase() ===
                           address?.toLowerCase() && (
                           <Badge variant="secondary" className="text-xs">
@@ -357,25 +333,37 @@ export default function SplitBillDetail({
                     </div>
                   </div>
                   <div className="text-right">
+                    {/* Show amount for all participants */}
                     <p className="text-sm font-medium text-foreground">
                       {formatAmount(participant.amount, 2)} USDC
                     </p>
-                    <div className="flex items-center gap-1">
-                      {participant.status === "paid" ||
-                      participant.status === "confirmed" ? (
-                        <>
-                          <CheckCircle className="h-3 w-3 text-green-600" />
-                          <span className="text-xs text-green-600">Paid</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="h-3 w-3 text-yellow-600" />
-                          <span className="text-xs text-yellow-600">
-                            Pending
-                          </span>
-                        </>
-                      )}
-                    </div>
+
+                    {/* Show different status for creator vs other participants */}
+                    {participant.address.toLowerCase() ===
+                    bill.creatorAddress.toLowerCase() ? (
+                      // Creator shows as Recipient
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-blue-600">Recipient</span>
+                      </div>
+                    ) : (
+                      // Other participants show payment status
+                      <div className="flex items-center gap-1">
+                        {participant.status === "paid" ||
+                        participant.status === "confirmed" ? (
+                          <>
+                            <CheckCircle className="h-3 w-3 text-green-600" />
+                            <span className="text-xs text-green-600">Paid</span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-3 w-3 text-yellow-600" />
+                            <span className="text-xs text-yellow-600">
+                              Pending
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -389,27 +377,30 @@ export default function SplitBillDetail({
                       onSuccess={(txHash) =>
                         handlePaymentSuccess(participant.id, txHash)
                       }
-                      onError={onError}
+                      onError={(txHash) =>
+                        handlePaymentSuccess(participant.id, txHash)
+                      }
                     />
                   )}
               </div>
             ))}
 
-            {/* Empty Slots */}
-            {Array.from({
-              length: bill.participantCount - bill.participants.length,
-            }).map((_, index) => (
-              <div key={`empty-${index}`} className="opacity-50">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-muted-foreground" />
+            {/* Empty Slots - Only show if there are still available slots */}
+            {bill.participants.length < bill.participantCount &&
+              Array.from({
+                length: bill.participantCount - bill.participants.length,
+              }).map((_, index) => (
+                <div key={`empty-${index}`} className="opacity-50">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <span className="text-muted-foreground">
+                      Waiting for participant to join
+                    </span>
                   </div>
-                  <span className="text-muted-foreground">
-                    Waiting for participant to join
-                  </span>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </CardContent>
       </Card>

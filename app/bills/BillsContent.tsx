@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { Button } from "@/components/ui/button";
 import {
   Card,

@@ -50,6 +50,19 @@ export default function CreatePage() {
         </p>
       </div>
 
+      {/* Message Display */}
+      {message && (
+        <div
+          className={`mb-4 p-3 rounded-lg text-sm ${
+            message.type === "success"
+              ? "bg-green-100 text-green-800 border border-green-200"
+              : "bg-red-100 text-red-800 border border-red-200"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
       {/* Create Split Form */}
       <div className="space-y-6">
         <CreateSplitForm onSuccess={handleSplitCreated} onError={handleError} />

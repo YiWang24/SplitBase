@@ -1,5 +1,7 @@
 // Core type definitions for split bill application
 
+import { usdcContractAddress } from "./config";
+
 export interface SplitBill {
   id: string;
   title: string;
@@ -76,6 +78,7 @@ export interface CreateSplitBillInput {
   participantCount: number;
   creatorAddress: string;
   creatorBasename?: string;
+  selectedFriends?: Friend[]; // 添加选中的好友列表
 }
 
 // Input type for joining split bill
@@ -137,7 +140,7 @@ export interface USDCTransferCall {
 
 // Base Pay configuration
 export const BASE_PAY_CONFIG = {
-  USDC_CONTRACT_ADDRESS: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base mainnet USDC
+  USDC_CONTRACT_ADDRESS: usdcContractAddress, // 从配置文件获取
   DECIMALS: 6, // USDC decimal places
   MIN_AMOUNT: "0.01", // Minimum split amount
   MAX_AMOUNT: "10000", // Maximum split amount

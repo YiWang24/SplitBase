@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@coinbase/onchainkit/identity";
 import { Check, Plus, Search, Star, X } from "lucide-react";
 import { Friend } from "@/lib/types";
 import {
@@ -150,14 +150,10 @@ export default function FriendSelector({
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-8 w-8">
-                        <div className="h-full w-full rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">
-                            {friend.nickname?.[0] ||
-                              friend.address.slice(2, 4).toUpperCase()}
-                          </span>
-                        </div>
-                      </Avatar>
+                      <Avatar
+                        className="h-8 w-8"
+                        address={friend.address as `0x${string}`}
+                      />
                       <div>
                         <div className="flex items-center space-x-2">
                           {friend.nickname && (
@@ -301,14 +297,10 @@ export default function FriendSelector({
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <div className="h-full w-full rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-medium text-primary">
-                              {friend.nickname?.[0] ||
-                                friend.address.slice(2, 4).toUpperCase()}
-                            </span>
-                          </div>
-                        </Avatar>
+                        <Avatar
+                          className="h-8 w-8"
+                          address={friend.address as `0x${string}`}
+                        />
                         <div>
                           <div className="flex items-center space-x-2">
                             {friend.nickname && (

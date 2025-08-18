@@ -68,12 +68,18 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
     );
   }
 
+  // 计算实际参与者数量
+  let actualParticipantCount = input.participantCount;
+  if (input.selectedFriends && input.selectedFriends.length > 0) {
+    actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
+  }
+
   // Validate participant count
-  if (!Number.isInteger(input.participantCount) || input.participantCount < 2) {
+  if (actualParticipantCount < 2) {
     errors.push("At least 2 participants required");
   }
 
-  if (input.participantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
+  if (actualParticipantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
     errors.push(
       `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
     );
@@ -86,7 +92,7 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
 
   // Validate if amount per person is reasonable
   const amountPerPerson = parseFloat(
-    calculateAmountPerPerson(input.totalAmount, input.participantCount),
+    calculateAmountPerPerson(input.totalAmount, actualParticipantCount),
   );
   if (amountPerPerson < parseFloat(BASE_PAY_CONFIG.MIN_AMOUNT)) {
     errors.push(
@@ -117,9 +123,16 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
   }
 
   const billId = generateBillId();
+
+  // 计算实际参与者数量和每人金额
+  let actualParticipantCount = input.participantCount;
+  if (input.selectedFriends && input.selectedFriends.length > 0) {
+    actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
+  }
+
   const amountPerPerson = calculateAmountPerPerson(
     input.totalAmount,
-    input.participantCount,
+    actualParticipantCount,
   );
 
   const bill: SplitBill = {
@@ -128,7 +141,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     description: input.description?.trim(),
     totalAmount: input.totalAmount,
     currency: "USDC",
-    participantCount: input.participantCount,
+    participantCount: actualParticipantCount, // 使用实际参与者数量
     amountPerPerson,
     creatorAddress: input.creatorAddress,
     creatorBasename: input.creatorBasename,
@@ -139,7 +152,31 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     shareUrl: generateShareUrl(billId),
   };
 
-  return bill;
+  // 将创建者添加为参与者（状态为已支付，因为创建者不需要支付）
+  let updatedBill = addCreatorAsParticipant(
+    bill,
+    input.creatorAddress,
+    input.creatorBasename,
+    input.creatorBasename || "Creator",
+  );
+
+  // 如果有选中的好友，自动添加为参与者
+  if (input.selectedFriends && input.selectedFriends.length > 0) {
+    for (const friend of input.selectedFriends) {
+      try {
+        updatedBill = addParticipant(
+          updatedBill,
+          friend.address,
+          friend.basename,
+          friend.nickname,
+        );
+      } catch (error) {
+        console.warn(`Failed to add friend ${friend.address}:`, error);
+      }
+    }
+  }
+
+  return updatedBill;
 }
 
 /**
@@ -148,6 +185,49 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
 export function generateShareUrl(billId: string): string {
   const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
   return `${baseUrl}/split/${billId}`;
+}
+
+/**
+ * 添加创建者作为参与者（状态为已支付）
+ */
+export function addCreatorAsParticipant(
+  bill: SplitBill,
+  address: string,
+  basename?: string,
+  displayName?: string,
+): SplitBill {
+  // 检查是否已经参与
+  const existingParticipant = bill.participants.find(
+    (p) => p.address.toLowerCase() === address.toLowerCase(),
+  );
+  if (existingParticipant) {
+    throw new Error("该地址已参与此分账");
+  }
+
+  // 验证地址
+  if (!isValidEthereumAddress(address)) {
+    throw new Error("无效的以太坊地址");
+  }
+
+  const participant: Participant = {
+    id: generateParticipantId(),
+    address: address.toLowerCase(),
+    basename,
+    displayName:
+      displayName ||
+      basename ||
+      `${address.slice(0, 6)}...${address.slice(-4)}`,
+    amount: bill.amountPerPerson,
+    status: "paid", // 创建者状态为已支付
+  };
+
+  const updatedBill: SplitBill = {
+    ...bill,
+    participants: [...bill.participants, participant],
+    updatedAt: new Date(),
+  };
+
+  return updatedBill;
 }
 
 /**
