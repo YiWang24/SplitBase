@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Home, Receipt, Plus, Users, Trophy } from "lucide-react";
+import { Home, Receipt, Plus, Users, Trophy, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -36,15 +36,15 @@ export default function BottomNavigation() {
       onClick: handleCreateClick,
     },
     {
-      href: "/friends",
-      icon: Users,
-      label: "Friends",
+      href: "/nfts",
+      icon: Star,
+      label: "NFTs",
       onClick: undefined,
     },
     {
-      href: "/friends/leaderboard",
-      icon: Trophy,
-      label: "Leaderboard",
+      href: "/friends",
+      icon: Users,
+      label: "Friends",
       onClick: undefined,
     },
   ];
@@ -63,10 +63,10 @@ export default function BottomNavigation() {
               isActive = pathname === "/bills";
             } else if (item.label === "Create") {
               isActive = pathname === "/create";
+            } else if (item.label === "NFTs") {
+              isActive = pathname === "/nfts";
             } else if (item.label === "Friends") {
               isActive = pathname === "/friends";
-            } else if (item.label === "Leaderboard") {
-              isActive = pathname === "/friends/leaderboard";
             }
 
             if (item.onClick) {

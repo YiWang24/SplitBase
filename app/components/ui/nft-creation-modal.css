@@ -1,0 +1,249 @@
+/* NFT Creation Modal Mobile Optimizations */
+
+/* Ensure modal is always on top */
+.nft-modal-mobile,
+.nft-modal-tablet,
+.nft-modal-desktop {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 640px) {
+  .nft-modal-mobile {
+    /* Ensure modal takes full screen on mobile */
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  /* Optimize header for mobile */
+  .nft-modal-header {
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  /* Optimize content spacing for mobile */
+  .nft-modal-content {
+    padding: 1rem;
+    padding-bottom: 2rem; /* Extra bottom padding for mobile */
+  }
+
+  /* Make form elements more touch-friendly */
+  .nft-form-select {
+    min-height: 44px; /* iOS minimum touch target */
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 0.75rem;
+  }
+
+  /* Optimize buttons for mobile */
+  .nft-action-button {
+    min-height: 56px; /* Android minimum touch target */
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0;
+    position: relative;
+    z-index: 10001;
+  }
+
+  /* Optimize preview container */
+  .nft-preview-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Optimize badges for mobile */
+  .nft-participant-badge {
+    font-size: 11px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+  }
+
+  /* Optimize progress indicator for mobile */
+  .nft-progress-container {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  /* Optimize error display for mobile */
+  .nft-error-container {
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+  }
+
+  /* Ensure proper spacing between sections */
+  .nft-section {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Optimize separators for mobile */
+  .nft-separator {
+    margin: 1rem 0;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .nft-modal-tablet {
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+
+  .nft-modal-content {
+    padding: 1.5rem;
+  }
+
+  .nft-preview-container {
+    max-width: 100%;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1025px) {
+  .nft-modal-desktop {
+    max-width: 42rem;
+    max-height: 85vh;
+  }
+
+  .nft-modal-content {
+    padding: 1.5rem;
+  }
+
+  .nft-preview-container {
+    max-width: 100%;
+  }
+}
+
+/* Touch-friendly improvements */
+.nft-touch-friendly {
+  /* Ensure all interactive elements are touch-friendly */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Enhanced button styles for better visibility */
+.nft-action-button {
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10001;
+}
+
+.nft-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nft-action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure buttons are always visible */
+.nft-action-button:disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth scrolling for modal content */
+.nft-modal-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Optimize backdrop for mobile */
+.nft-backdrop-mobile {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Loading state optimizations */
+.nft-loading-optimized {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Button state optimizations */
+.nft-button-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Focus states for accessibility */
+.nft-focus-visible:focus-visible {
+  outline: 2px solid #c9e265;
+  outline-offset: 2px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .nft-modal-dark {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .nft-modal-dark .nft-form-select {
+    background-color: #2a2a2a;
+    border-color: #404040;
+    color: #ffffff;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .nft-high-contrast {
+    border-width: 3px;
+  }
+
+  .nft-high-contrast .nft-form-select {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .nft-reduced-motion {
+    animation: none;
+    transition: none;
+  }
+
+  .nft-reduced-motion .nft-loading-spinner {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .nft-modal-print {
+    position: static;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .nft-modal-print .nft-modal-header {
+    background: none !important;
+    color: #000 !important;
+  }
+}

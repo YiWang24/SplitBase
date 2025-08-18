@@ -1,6 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { useAccount } from "wagmi";
 import { SplitBill } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,8 @@ export default function CompletionModal({
   bill,
   onCreateNFT,
 }: CompletionModalProps) {
+  const { isConnected } = useAccount();
+
   const handleCreateNFT = async () => {
     if (!onCreateNFT) return;
 
@@ -53,7 +56,11 @@ export default function CompletionModal({
           </p>
         </DialogHeader>
         <div className="space-y-4">
-          <ReceiptDetail bill={bill} onCreateNFT={handleCreateNFT} />
+          <ReceiptDetail
+            bill={bill}
+            onCreateNFT={handleCreateNFT}
+            isWalletConnected={isConnected}
+          />
           <Button
             variant="outline"
             size="lg"

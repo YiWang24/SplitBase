@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import {
   CheckCircle,
   AlertCircle,
   Crown,
+  Trophy,
 } from "lucide-react";
 import { Friend, AddFriendInput } from "@/lib/types";
 import {
@@ -255,6 +257,7 @@ function FriendModal({
 
 export default function FriendsPage() {
   const { isConnected, address } = useAccount();
+  const router = useRouter();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -471,14 +474,27 @@ export default function FriendsPage() {
           />
         </div>
 
-        {/* Add Friend Button */}
-        <Button
-          onClick={openAddModal}
-          className="w-full h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0"
-        >
-          <UserPlus className="mr-2 h-5 w-5" />
-          Add New Friend
-        </Button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Add Friend Button */}
+          <Button
+            onClick={openAddModal}
+            className="h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0"
+          >
+            <UserPlus className="mr-2 h-5 w-5" />
+            Add Friend
+          </Button>
+
+          {/* Leaderboard Button */}
+          <Button
+            onClick={() => router.push("/friends/leaderboard")}
+            variant="outline"
+            className="h-12 border-2 border-[#89d957]/30 text-[#89d957] font-bold hover:bg-[#89d957]/10 hover:border-[#89d957] transition-all duration-300 rounded-xl"
+          >
+            <Trophy className="mr-2 h-5 w-5" />
+            Leaderboard
+          </Button>
+        </div>
       </div>
 
       {/* Friend Modal */}

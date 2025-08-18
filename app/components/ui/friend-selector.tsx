@@ -206,93 +206,101 @@ export default function FriendSelector({
       )}
 
       {/* Add Friend Section */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <Label className="text-sm font-bold text-neutral-700 uppercase tracking-wide">
-            Add Participants
-          </Label>
-          <span className="text-xs text-neutral-500 font-medium bg-neutral-100 px-3 py-1 rounded-full">
-            {availableSlots} slots available
-          </span>
-        </div>
+      {isConnected ? (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <Label className="text-sm font-bold text-neutral-700 uppercase tracking-wide">
+              Add Participants
+            </Label>
+            <span className="text-xs text-neutral-500 font-medium bg-neutral-100 px-3 py-1 rounded-full">
+              {availableSlots} slots available
+            </span>
+          </div>
 
-        {!showAddForm ? (
-          <Button
-            variant="outline"
-            onClick={() => setShowAddForm(true)}
-            disabled={availableSlots <= 0}
-            className={`w-full h-12 font-bold transition-all duration-300 ${
-              availableSlots > 0
-                ? "border-2 border-[#89d957]/30 text-[#89d957] hover:bg-[#89d957]/10 hover:border-[#89d957] hover:scale-105"
-                : "border-neutral-200 text-neutral-400 cursor-not-allowed"
-            }`}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Participant
-          </Button>
-        ) : (
-          <Card className="border-2 border-[#89d957]/20 bg-gradient-to-br from-[#89d957]/5 to-[#6bbf3a]/5 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base font-bold text-neutral-800 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-[#89d957] to-[#6bbf3a] rounded-lg flex items-center justify-center">
-                  <Plus className="h-3 w-3 text-white" />
+          {!showAddForm ? (
+            <Button
+              variant="outline"
+              onClick={() => setShowAddForm(true)}
+              disabled={availableSlots <= 0}
+              className={`w-full h-12 font-bold transition-all duration-300 ${
+                availableSlots > 0
+                  ? "border-2 border-[#89d957]/30 text-[#89d957] hover:bg-[#89d957]/10 hover:border-[#89d957] hover:scale-105"
+                  : "border-neutral-200 text-neutral-400 cursor-not-allowed"
+              }`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Participant
+            </Button>
+          ) : (
+            <Card className="border-2 border-[#89d957]/20 bg-gradient-to-br from-[#89d957]/5 to-[#6bbf3a]/5 shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-bold text-neutral-800 flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-[#89d957] to-[#6bbf3a] rounded-lg flex items-center justify-center">
+                    <Plus className="h-3 w-3 text-white" />
+                  </div>
+                  Add New Participant
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label
+                    htmlFor="new-address"
+                    className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+                  >
+                    Wallet Address *
+                  </Label>
+                  <Input
+                    id="new-address"
+                    placeholder="0x..."
+                    value={newAddress}
+                    onChange={(e) => setNewAddress(e.target.value)}
+                    className="mt-2 h-12 border-2 border-[#c9e265]/20 focus:border-[#c9e265] focus:ring-[#c9e265]/20 transition-all duration-300 rounded-xl placeholder:text-neutral-500 placeholder:font-medium"
+                  />
                 </div>
-                Add New Participant
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="new-address"
-                  className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
-                >
-                  Wallet Address *
-                </Label>
-                <Input
-                  id="new-address"
-                  placeholder="0x..."
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                  className="mt-2 h-12 border-2 border-[#c9e265]/20 focus:border-[#c9e265] focus:ring-[#c9e265]/20 transition-all duration-300 rounded-xl placeholder:text-neutral-500 placeholder:font-medium"
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="new-nickname"
-                  className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
-                >
-                  Nickname (Optional)
-                </Label>
-                <Input
-                  id="new-nickname"
-                  placeholder="Johnny"
-                  value={newNickname}
-                  onChange={(e) => setNewNickname(e.target.value)}
-                  className="mt-2 h-12 border-2 border-[#6bbf3a]/20 focus:border-[#6bbf3a] focus:ring-[#6bbf3a]/20 transition-all duration-300 rounded-xl placeholder:text-neutral-500 placeholder:font-medium"
-                />
-              </div>
-              <div className="flex space-x-3 pt-2">
-                <Button
-                  onClick={handleAddByAddress}
-                  className="flex-1 h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-                >
-                  Add & Select
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowAddForm(false)}
-                  className="flex-1 h-12 border-2 border-neutral-300 text-neutral-600 font-bold hover:bg-neutral-50 transition-all duration-300"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                <div>
+                  <Label
+                    htmlFor="new-nickname"
+                    className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+                  >
+                    Nickname (Optional)
+                  </Label>
+                  <Input
+                    id="new-nickname"
+                    placeholder="Johnny"
+                    value={newNickname}
+                    onChange={(e) => setNewNickname(e.target.value)}
+                    className="mt-2 h-12 border-2 border-[#6bbf3a]/20 focus:border-[#6bbf3a] focus:ring-[#6bbf3a]/20 transition-all duration-300 rounded-xl placeholder:text-neutral-500 placeholder:font-medium"
+                  />
+                </div>
+                <div className="flex space-x-3 pt-2">
+                  <Button
+                    onClick={handleAddByAddress}
+                    className="flex-1 h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                  >
+                    Add & Select
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddForm(false)}
+                    className="flex-1 h-12 border-2 border-neutral-300 text-neutral-600 font-bold hover:bg-neutral-50 transition-all duration-300"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        <div className="text-center p-4 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-xl">
+          <p className="text-sm text-red-700 font-bold uppercase tracking-wide">
+            🔗 CONNECT WALLET TO ADD PARTICIPANTS
+          </p>
+        </div>
+      )}
 
       {/* Friends List for Selection */}
-      {friends.length > 0 && (
+      {isConnected && friends.length > 0 && (
         <div>
           <div className="mb-3">
             <div className="relative">
@@ -390,7 +398,7 @@ export default function FriendSelector({
       )}
 
       {/* Empty State */}
-      {friends.length === 0 && !showAddForm && (
+      {isConnected && friends.length === 0 && !showAddForm && (
         <Card className="border-2 border-dashed border-neutral-300 bg-gradient-to-br from-neutral-50 to-neutral-100">
           <CardContent className="pt-8 pb-8 text-center">
             <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#c9e265]/20 to-[#89d957]/20 rounded-2xl flex items-center justify-center mb-4">

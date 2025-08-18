@@ -390,7 +390,6 @@ export default function CreateSplitForm({
                     className="w-24 h-12 text-center text-xl font-bold border-2 border-[#89d957]/30 focus:border-[#89d957] focus:ring-[#89d957]/20 transition-all duration-300 rounded-xl"
                     required
                   />
-                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-[#c9e265] to-[#89d957] rounded-full opacity-60"></div>
                 </div>
                 <Button
                   type="button"
