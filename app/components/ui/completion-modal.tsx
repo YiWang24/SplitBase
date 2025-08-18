@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Check } from "lucide-react";
 import { SplitBill } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -25,22 +24,13 @@ export default function CompletionModal({
   bill,
   onCreateNFT,
 }: CompletionModalProps) {
-  const [isCreatingNFT, setIsCreatingNFT] = useState(false);
-
-  useEffect(() => {
-    // no-op; keep for potential side effects
-  }, []);
-
   const handleCreateNFT = async () => {
     if (!onCreateNFT) return;
 
-    setIsCreatingNFT(true);
     try {
       await onCreateNFT();
     } catch (error) {
       console.error("Error creating NFT:", error);
-    } finally {
-      setIsCreatingNFT(false);
     }
   };
 

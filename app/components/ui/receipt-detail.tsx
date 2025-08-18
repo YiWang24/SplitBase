@@ -47,7 +47,7 @@ export default function ReceiptDetail({
         if (result?.success && result?.data) {
           setBill(result.data as SplitBill);
         }
-      } catch (e) {
+      } catch {
         // noop for now
       } finally {
         setIsLoading(false);

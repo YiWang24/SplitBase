@@ -7,7 +7,6 @@ import {
   Share,
   QrCode,
   Check,
-  X,
   Users,
   DollarSign,
   Wallet,
