@@ -16,6 +16,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  Receipt,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +33,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar as OnchainAvatar } from "@coinbase/onchainkit/identity";
 import PaymentButton from "./payment-button";
 import ShareModal from "./share-modal";
-import CompletionModal from "./completion-modal";
+import { useRouter } from "next/navigation";
 
 interface SplitBillDetailProps {
   billId: string;
@@ -50,7 +52,7 @@ export default function SplitBillDetail({
   const [isJoining, setIsJoining] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const router = useRouter();
 
   // Fetch bill details
   const fetchBillDetail = async () => {
@@ -61,13 +63,7 @@ export default function SplitBillDetail({
 
       if (result.success && result.data) {
         const newBill = result.data;
-        const oldStatus = bill?.status;
         setBill(newBill);
-
-        // Show completion modal if status changed from non-completed to completed
-        if (oldStatus !== "completed" && newBill.status === "completed") {
-          setShowCompletionModal(true);
-        }
       } else {
         onError(result.error || "Failed to fetch split details");
       }
@@ -165,13 +161,6 @@ export default function SplitBillDetail({
     setShowShareModal(true);
   };
 
-  // Create NFT receipt
-  const handleCreateNFT = async () => {
-    // TODO: Implement NFT receipt generation logic
-    // This can integrate with NFT minting services
-    onSuccess("NFT receipt generation feature coming soon!");
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -226,176 +215,230 @@ export default function SplitBillDetail({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* Split Title and Status */}
-      <Card className="backdrop-blur-md">
-        <CardHeader>
+      <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader className="pb-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-xl mb-1">{bill.title}</CardTitle>
+              <CardTitle className="text-xl mb-2 font-bold tracking-wide text-neutral-900">
+                {bill.title.toUpperCase()}
+              </CardTitle>
               {bill.description && (
-                <CardDescription>{bill.description}</CardDescription>
+                <CardDescription className="text-sm text-neutral-600 leading-relaxed">
+                  {bill.description}
+                </CardDescription>
               )}
             </div>
-            <Badge className={getStatusColor(bill.status)}>
-              {getStatusText(bill.status)}
+            <Badge
+              className={`px-3 py-1 text-xs font-bold tracking-wide rounded-full border-2 ${getStatusColor(bill.status)}`}
+            >
+              {getStatusText(bill.status).toUpperCase()}
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           {/* Amount Information */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Total Amount</p>
-              <p className="text-2xl font-bold text-foreground">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="text-center p-4 bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-primary)]/5 rounded-xl border border-[var(--brand-primary)]/20">
+              <p className="text-xs font-medium tracking-wide text-neutral-600 mb-2">
+                TOTAL AMOUNT
+              </p>
+              <p className="text-2xl font-bold text-[var(--brand-primary)]">
                 {formatAmount(bill.totalAmount, 2)} USDC
               </p>
             </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Each Pays</p>
-              <p className="text-2xl font-bold text-primary">
+            <div className="text-center p-4 bg-gradient-to-br from-[var(--brand-secondary)]/10 to-[var(--brand-secondary)]/5 rounded-xl border border-[var(--brand-secondary)]/20">
+              <p className="text-xs font-medium tracking-wide text-neutral-600 mb-2">
+                EACH PAYS
+              </p>
+              <p className="text-2xl font-bold text-[var(--brand-secondary)]">
                 {formatAmount(bill.amountPerPerson, 2)} USDC
               </p>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Completion Progress</span>
-              <span>{stats.completionRate}%</span>
+          <div className="space-y-3 p-4 bg-gradient-to-r from-neutral-50 to-[var(--brand-primary)]/5 rounded-xl border border-neutral-200/50">
+            <div className="flex justify-between text-sm font-medium text-neutral-700">
+              <span>COMPLETION PROGRESS</span>
+              <span className="text-[var(--brand-primary)]">
+                {stats.completionRate}%
+              </span>
             </div>
-            <Progress value={stats.completionRate} className="w-full" />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>
+            <Progress
+              value={stats.completionRate}
+              className="w-full h-3 bg-neutral-200"
+            />
+            <div className="flex justify-between text-xs text-neutral-600">
+              <span className="flex items-center gap-1">
+                <CheckCircle className="w-3 h-3 text-green-600" />
                 {stats.paidParticipants}/{bill.participantCount} people paid
               </span>
-              <span>{formatAmount(stats.totalPaid, 2)} USDC received</span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-[var(--brand-primary)] rounded-full"></span>
+                {formatAmount(stats.totalPaid, 2)} USDC received
+              </span>
             </div>
           </div>
 
-          {/* Share Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-            className="w-full"
-          >
-            <Share className="mr-2 h-4 w-4" />
-            Share Split
-          </Button>
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="w-full border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 hover:border-[var(--brand-primary)]/70 transition-all duration-300"
+            >
+              <Share className="mr-2 h-4 w-4" />
+              Share Split
+            </Button>
+
+            {/* View Receipt Button - Only show for completed bills */}
+            {bill.status === "completed" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/receipts/${bill.id}`)}
+                className="w-full border-[var(--brand-secondary)] text-[var(--brand-secondary)] hover:bg-[var(--brand-secondary)]/10 hover:border-[var(--brand-secondary)]/70 transition-all duration-300"
+              >
+                <Receipt className="mr-2 h-4 w-4" />
+                View Receipt
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
       {/* Participants List */}
-      <Card className="backdrop-blur-md">
-        <CardHeader>
-          <CardTitle className="text-lg">
-            Participants ({bill.participants.length}/{bill.participantCount})
+      <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-bold tracking-wide text-neutral-900 flex items-center gap-2">
+            <Users className="w-5 h-5 text-[var(--brand-secondary)]" />
+            PARTICIPANTS ({bill.participants.length}/{bill.participantCount})
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {/* Participants */}
           <div className="space-y-4">
-            {bill.participants.map((participant: Participant) => (
-              <div key={participant.id} className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <OnchainAvatar
-                      address={participant.address as `0x${string}`}
-                      className="w-8 h-8"
-                    />
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium text-foreground">
-                          {participant.displayName}
-                        </span>
+            {bill.participants.map(
+              (participant: Participant, index: number) => (
+                <div
+                  key={participant.id}
+                  className="space-y-3 p-3 rounded-lg bg-gradient-to-r from-white/80 to-neutral-50/80 border border-neutral-200/50 hover:border-[var(--brand-primary)]/30 transition-all duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="relative">
+                        <OnchainAvatar
+                          address={participant.address as `0x${string}`}
+                          className="w-10 h-10 border-2 border-white shadow-md"
+                        />
                         {/* Show Creator badge for creator */}
                         {participant.address.toLowerCase() ===
                           bill.creatorAddress.toLowerCase() && (
-                          <Badge variant="default" className="text-xs">
-                            Creator
-                          </Badge>
-                        )}
-                        {/* Show You badge for current user */}
-                        {participant.address.toLowerCase() ===
-                          address?.toLowerCase() && (
-                          <Badge variant="secondary" className="text-xs">
-                            You
-                          </Badge>
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--brand-primary)] rounded-full flex items-center justify-center border-2 border-white">
+                            <span className="text-[8px] font-bold text-white">
+                              C
+                            </span>
+                          </div>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {formatAddress(participant.address)}
+                      <div>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="font-medium text-neutral-900">
+                            {participant.displayName}
+                          </span>
+                          {/* Show You badge for current user */}
+                          {participant.address.toLowerCase() ===
+                            address?.toLowerCase() && (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-2 py-0.5 bg-[var(--brand-secondary)]/20 border-[var(--brand-secondary)] text-[var(--brand-secondary)]"
+                            >
+                              YOU
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-neutral-500 font-mono">
+                          {formatAddress(participant.address)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {/* Show amount for all participants */}
+                      <p className="text-sm font-bold text-neutral-900 mb-1">
+                        {formatAmount(participant.amount, 2)} USDC
                       </p>
+
+                      {/* Show different status for creator vs other participants */}
+                      {participant.address.toLowerCase() ===
+                      bill.creatorAddress.toLowerCase() ? (
+                        // Creator shows as Recipient
+                        <div className="flex items-center justify-end gap-1">
+                          <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-200">
+                            RECIPIENT
+                          </span>
+                        </div>
+                      ) : (
+                        // Other participants show payment status
+                        <div className="flex items-center justify-end gap-1">
+                          {participant.status === "paid" ||
+                          participant.status === "confirmed" ? (
+                            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-200 flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              PAID
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-200 flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              PENDING
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    {/* Show amount for all participants */}
-                    <p className="text-sm font-medium text-foreground">
-                      {formatAmount(participant.amount, 2)} USDC
-                    </p>
 
-                    {/* Show different status for creator vs other participants */}
-                    {participant.address.toLowerCase() ===
-                    bill.creatorAddress.toLowerCase() ? (
-                      // Creator shows as Recipient
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-blue-600">Recipient</span>
-                      </div>
-                    ) : (
-                      // Other participants show payment status
-                      <div className="flex items-center gap-1">
-                        {participant.status === "paid" ||
-                        participant.status === "confirmed" ? (
-                          <>
-                            <CheckCircle className="h-3 w-3 text-green-600" />
-                            <span className="text-xs text-green-600">Paid</span>
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="h-3 w-3 text-yellow-600" />
-                            <span className="text-xs text-yellow-600">
-                              Pending
-                            </span>
-                          </>
-                        )}
+                  {/* Payment Button */}
+                  {participant.address.toLowerCase() ===
+                    address?.toLowerCase() &&
+                    participant.status === "pending" &&
+                    bill.status === "active" && (
+                      <div className="pt-2 border-t border-neutral-200/50">
+                        <PaymentButton
+                          recipientAddress={bill.creatorAddress}
+                          amount={participant.amount}
+                          onSuccess={(txHash) =>
+                            handlePaymentSuccess(participant.id, txHash)
+                          }
+                          onError={(txHash) =>
+                            handlePaymentSuccess(participant.id, txHash)
+                          }
+                        />
                       </div>
                     )}
-                  </div>
                 </div>
-
-                {/* Payment Button */}
-                {participant.address.toLowerCase() === address?.toLowerCase() &&
-                  participant.status === "pending" &&
-                  bill.status === "active" && (
-                    <PaymentButton
-                      recipientAddress={bill.creatorAddress}
-                      amount={participant.amount}
-                      onSuccess={(txHash) =>
-                        handlePaymentSuccess(participant.id, txHash)
-                      }
-                      onError={(txHash) =>
-                        handlePaymentSuccess(participant.id, txHash)
-                      }
-                    />
-                  )}
-              </div>
-            ))}
+              ),
+            )}
 
             {/* Empty Slots - Only show if there are still available slots */}
             {bill.participants.length < bill.participantCount &&
               Array.from({
                 length: bill.participantCount - bill.participants.length,
               }).map((_, index) => (
-                <div key={`empty-${index}`} className="opacity-50">
+                <div
+                  key={`empty-${index}`}
+                  className="opacity-60 p-3 rounded-lg bg-gradient-to-r from-neutral-100/50 to-neutral-50/50 border border-dashed border-neutral-300/50"
+                >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-muted-foreground" />
+                    <div className="w-10 h-10 bg-neutral-200 rounded-full flex items-center justify-center border-2 border-dashed border-neutral-300">
+                      <User className="h-5 w-5 text-neutral-400" />
                     </div>
-                    <span className="text-muted-foreground">
+                    <span className="text-neutral-500 font-medium">
                       Waiting for participant to join
                     </span>
                   </div>
@@ -411,29 +454,35 @@ export default function SplitBillDetail({
           size="lg"
           onClick={handleJoinBill}
           disabled={isJoining}
-          className="w-full"
+          className="w-full bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] hover:from-[var(--brand-primary-dark)] hover:to-[var(--brand-secondary-dark)] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 font-bold tracking-wide"
         >
-          <Plus className="mr-2 h-4 w-4" />
-          {isJoining ? "Joining..." : "Join Split"}
+          <Plus className="mr-2 h-5 w-5" />
+          {isJoining ? "JOINING..." : "JOIN SPLIT"}
         </Button>
       )}
 
       {/* Cannot Join Message */}
       {!isCreator && !userParticipant && !canJoinResult.canJoin && (
-        <div className="text-center py-4">
-          <p className="text-muted-foreground">
-            {canJoinResult.reason || "Cannot join this split"}
-          </p>
-        </div>
+        <Card className="text-center p-6 bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200/50">
+          <CardContent className="space-y-2">
+            <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+            <p className="text-red-700 font-medium">
+              {canJoinResult.reason || "Cannot join this split"}
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Wallet Not Connected Message */}
       {!address && (
-        <div className="text-center py-4">
-          <p className="text-yellow-600">
-            Please connect wallet to participate in split
-          </p>
-        </div>
+        <Card className="text-center p-6 bg-gradient-to-r from-yellow-50 to-yellow-100/50 border-2 border-yellow-200/50">
+          <CardContent className="space-y-2">
+            <AlertCircle className="mx-auto h-8 w-8 text-yellow-500" />
+            <p className="text-yellow-700 font-medium">
+              Please connect wallet to participate in split
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Share Modal */}
@@ -447,15 +496,15 @@ export default function SplitBillDetail({
         />
       )}
 
-      {/* Completion Modal */}
-      {bill && (
+      {/* Completion Modal - Removed auto-popup */}
+      {/* {bill && (
         <CompletionModal
           isOpen={showCompletionModal}
           onClose={() => setShowCompletionModal(false)}
           bill={bill}
           onCreateNFT={handleCreateNFT}
         />
-      )}
+      )} */}
     </div>
   );
 }

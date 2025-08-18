@@ -70,14 +70,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)] overflow-x-hidden relative">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 border-b border-border bg-card/50 backdrop-blur-sm z-50">
+      <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 border-b border-border bg-card/50 backdrop-blur-sm z-50 text-gray-900 dark:text-gray-100">
         <div className="w-full max-w-md mx-auto flex justify-between items-center">
           {/* Left side - Logo and App Name */}
           <div className="flex items-center space-x-2">
             <Wallet className="h-5 w-5 text-primary" />
             <div className="flex flex-col">
-              <span className="text-sm font-bold">SplitBase</span>
-              <span className="text-[8px] text-muted-foreground leading-none">
+              <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                SplitBase
+              </span>
+              <span className="text-[8px] text-gray-700 dark:text-gray-300 leading-none">
                 Base Pay Splits
               </span>
             </div>
@@ -95,12 +97,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <main className="flex-1 w-full overflow-x-hidden pt-20">{children}</main>
 
       {/* Footer */}
-      <footer className="mt-auto pt-6 pb-32 border-t border-border bg-card/50 backdrop-blur-sm w-full">
+      <footer className="mt-auto pt-4 pb-24 border-t border-border bg-card/50 backdrop-blur-sm w-full text-gray-800 dark:text-gray-200">
         <div className="w-full max-w-md mx-auto px-4 flex justify-center">
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-foreground text-xs font-normal"
+            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 text-xs font-normal"
             onClick={() => openUrl("https://base.org/builders/minikit")}
           >
             <span className="text-xs">Built with ❤️ on Base</span>

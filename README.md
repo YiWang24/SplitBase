@@ -1,162 +1,162 @@
-# SplitBase - Base Pay 分账应用
+# SplitBase - Base Pay Split Bill App
 
-SplitBase 是一个基于 Base 区块链的分账支付应用，让用户在聚餐/活动中快速完成分账支付，并利用 Base Pay (USDC) 结算。
+SplitBase is a split-payment app built on the Base blockchain. It helps groups quickly split bills at dinners or events and settle using Base Pay (USDC).
 
-## 🎯 产品特色
+## 🎯 Key Features
 
-- **快速分账**: 输入总金额和人数，自动计算每人应付金额
-- **Base Pay 支付**: 使用 USDC 在 Base 网络上完成支付
-- **实时状态**: 支付状态实时更新，进度一目了然
-- **分享功能**: 生成分享链接和二维码，邀请朋友加入
-- **NFT 收据**: 分账完成后可生成 NFT 收据作为数字凭证
-- **MiniKit 集成**: 优化的移动端体验
+- **Fast splitting**: Enter total amount and participants, and get per-person amount automatically
+- **Base Pay**: Settle with USDC on the Base network
+- **Real-time status**: Live payment status and clear progress
+- **Sharing**: Generate share links and QR codes to invite friends
+- **NFT receipts**: Optionally mint an NFT receipt after completion
+- **MiniKit integration**: Optimized mobile experience
 
-## 🛠 技术栈
+## 🛠 Tech Stack
 
-- [Next.js](https://nextjs.org) - React 框架
-- [MiniKit](https://docs.base.org/builderkits/minikit/overview) - Farcaster Mini App 框架
-- [OnchainKit](https://www.base.org/builders/onchainkit) - Base 区块链集成
-- [Tailwind CSS](https://tailwindcss.com) - 样式框架
-- [TypeScript](https://www.typescriptlang.org) - 类型安全
-- [Redis](https://redis.io) - 数据存储
-- [QRCode.js](https://github.com/soldair/node-qrcode) - 二维码生成
+- [Next.js](https://nextjs.org) - React framework
+- [MiniKit](https://docs.base.org/builderkits/minikit/overview) - Farcaster Mini App framework
+- [OnchainKit](https://www.base.org/builders/onchainkit) - Base blockchain integration
+- [Tailwind CSS](https://tailwindcss.com) - Styling
+- [TypeScript](https://www.typescriptlang.org) - Type safety
+- [Redis](https://redis.io) - Data storage
+- [QRCode.js](https://github.com/soldair/node-qrcode) - QR code generation
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 安装依赖
+### 1. Install dependencies
 
 ```bash
 npm install
-# 或
+# or
 yarn install
 ```
 
-### 2. 配置环境变量
+### 2. Configure environment variables
 
-创建 `.env.local` 文件并配置以下变量：
+Create a `.env.local` file and set:
 
 ```bash
-# 基础配置
+# Base config
 NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME=SplitBase
 NEXT_PUBLIC_URL=http://localhost:3000
 NEXT_PUBLIC_ICON_URL=http://localhost:3000/icon.png
 NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_onchainkit_api_key_here
 
-# Frame 元数据
-NEXT_PUBLIC_APP_SUBTITLE=聚餐分账新体验
-NEXT_PUBLIC_APP_DESCRIPTION=使用 Base Pay 快速完成分账支付，支持 USDC 结算
-NEXT_PUBLIC_APP_TAGLINE=Base Pay 分账，轻松结算
+# Frame metadata
+NEXT_PUBLIC_APP_SUBTITLE=A new bill-splitting experience
+NEXT_PUBLIC_APP_DESCRIPTION=Quickly split and settle with Base Pay and USDC
+NEXT_PUBLIC_APP_TAGLINE=Base Pay splitting, easy settlement
 
-# Redis 配置 (可选，用于通知功能)
+# Redis (optional, for notifications and storage)
 REDIS_URL=your_redis_url
 REDIS_TOKEN=your_redis_token
 ```
 
-### 3. 启动开发服务器
+### 3. Run the dev server
 
 ```bash
 npm run dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000) 查看应用。
+Open http://localhost:3000 to view the app.
 
-## 📱 核心功能
+## 📱 Core Flows
 
-### 1. 发起分账
+### 1. Create a split
 
-- 输入分账标题和描述
-- 设置总金额 (USDC) 和参与人数
-- 自动计算每人应付金额
-- 生成分享链接和二维码
+- Enter a title and description
+- Set total amount (USDC) and participant count
+- Auto-calculate per-person amount
+- Generate share link and QR code
 
-### 2. 参与支付
+### 2. Join and pay
 
-- 扫描二维码或点击分享链接加入
-- 使用 Basename (.base) 身份登录
-- 通过 OnchainKit 完成 USDC 转账
-- 实时更新支付状态
+- Join via QR or shared link
+- Sign in with Basename (.base)
+- Pay USDC via OnchainKit
+- Status updates in real time
 
-### 3. 状态管理
+### 3. Status tracking
 
-- 实时显示支付进度
-- 参与者列表和状态跟踪
-- 分账完成自动通知
-- 生成 NFT 收据 (即将推出)
+- Live progress display
+- Participant list and status tracking
+- Auto notification when completed
+- NFT receipt (coming soon)
 
-### 4. 社交分享
+### 4. Social sharing
 
-- 二维码生成和分享
-- 复制分享链接
-- 社交媒体分享 (支持原生分享 API)
-- 分账完成庆祝动画
+- Generate/share QR codes
+- Copy share links
+- Native share API support
+- Celebration animation on completion
 
-## 🏗 项目结构
+## 🏗 Project Structure
 
 ```
 app/
-├── api/                    # API 路由
-│   ├── split/              # 分账相关 API
-│   ├── notify/             # 通知功能
-│   └── webhook/            # Webhook 处理
-├── components/             # React 组件
-│   ├── CreateSplitForm.tsx # 创建分账表单
-│   ├── SplitBillDetail.tsx # 分账详情页面
-│   ├── PaymentButton.tsx  # 支付按钮
-│   ├── ShareModal.tsx     # 分享模态框
-│   └── CompletionModal.tsx # 完成庆祝页面
-├── split/[billId]/         # 动态分账页面
-└── page.tsx               # 首页
+├── api/                    # API routes
+│   ├── split/              # Split-related APIs
+│   ├── notify/             # Notifications
+│   └── webhook/            # Webhook handling
+├── components/             # React components
+│   ├── CreateSplitForm.tsx # Create split form
+│   ├── SplitBillDetail.tsx # Split detail page
+│   ├── PaymentButton.tsx   # Pay button
+│   ├── ShareModal.tsx      # Share modal
+│   └── CompletionModal.tsx # Completion celebration
+├── split/[billId]/         # Dynamic split page
+└── page.tsx                # Home
 
 lib/
-├── types.ts               # TypeScript 类型定义
-├── split-utils.ts         # 分账工具函数
-├── split-storage.ts       # 数据存储管理
-├── notification.ts        # 通知功能
-└── redis.ts              # Redis 客户端
+├── types.ts               # TypeScript types
+├── split-utils.ts         # Split utilities
+├── split-storage.ts       # Storage management
+├── notification.ts        # Notifications
+└── redis.ts              # Redis client
 ```
 
-## 🔧 技术细节
+## 🔧 Technical Details
 
-### Base Pay 集成
+### Base Pay integration
 
-- 使用 Base 网络的 USDC 合约 (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
-- 通过 OnchainKit 的 Transaction 组件处理支付
-- 支持赞助交易 (Sponsored Transactions)
-- 实时交易状态跟踪
+- Uses USDC contract on Base (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
+- Payments via OnchainKit Transaction component
+- Supports Sponsored Transactions
+- Real-time transaction tracking
 
-### 数据存储
+### Data storage
 
-- 使用 Redis 作为临时存储 (可配置过期时间)
-- 支持分账数据、参与者信息、交易记录
-- 可扩展到持久化数据库 (PostgreSQL/MongoDB)
+- Redis as temporary storage (with TTL)
+- Supports split data, participants, transaction records
+- Can be extended to persistent DB (PostgreSQL/MongoDB)
 
-### MiniKit 优化
+### MiniKit optimizations
 
-- 响应式设计，移动端优先
-- 安全区域适配 (Safe Area Insets)
-- Frame SDK 集成
-- 原生分享功能支持
+- Responsive, mobile-first
+- Safe area (insets) support
+- Frame SDK integration
+- Native sharing support
 
-## 🚀 部署
+## 🚀 Deployment
 
-### Vercel 部署
+### Vercel
 
 ```bash
 npm run build
-# 部署到 Vercel
+# deploy to Vercel
 vercel
 ```
 
-### 环境配置
+### Environment
 
-- 配置 OnchainKit API Key
-- 设置 Redis 连接 (Upstash 推荐)
-- 配置 Frame 元数据
-- 设置域名和 HTTPS
+- Configure OnchainKit API key
+- Set up Redis (Upstash recommended)
+- Configure Frame metadata
+- Domain and HTTPS
 
-## 📖 了解更多
+## 📖 Learn more
 
-- [MiniKit 文档](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit 文档](https://docs.base.org/builderkits/onchainkit/getting-started)
-- [Base 开发者文档](https://docs.base.org)
+- [MiniKit docs](https://docs.base.org/builderkits/minikit/overview)
+- [OnchainKit docs](https://docs.base.org/builderkits/onchainkit/getting-started)
+- [Base developer docs](https://docs.base.org)
 - [USDC on Base](https://www.centre.io/usdc-multichain/base)

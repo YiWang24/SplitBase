@@ -80,7 +80,7 @@ export default function BottomNavigation() {
                     "flex flex-col h-auto py-2 px-3 font-mono text-xs tracking-wider transition-all duration-200",
                     isActive
                       ? "bg-primary text-primary-foreground transform -translate-y-0.5 shadow-md"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent hover:transform hover:-translate-y-0.5",
+                      : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-accent hover:transform hover:-translate-y-0.5",
                   )}
                 >
                   <Icon className="w-5 h-5 mb-1" />
@@ -100,7 +100,7 @@ export default function BottomNavigation() {
                     "flex flex-col h-auto py-2 px-3 font-mono text-xs tracking-wider transition-all duration-200",
                     isActive
                       ? "bg-primary text-primary-foreground transform -translate-y-0.5 shadow-md"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent hover:transform hover:-translate-y-0.5",
+                      : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-accent hover:transform hover:-translate-y-0.5",
                   )}
                 >
                   <Icon className="w-5 h-5 mb-1" />

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Users, TrendingUp, Star, Crown, Sparkles } from "lucide-react";
 import { Friend } from "@/lib/types";
 import { getFriendsFromStorage, getTopFriends } from "@/lib/friend-utils";
+import WalletNotConnected from "@/app/components/ui/wallet-not-connected";
 
 // Calculate intimacy score for a friend
 const calculateIntimacyScore = (friend: Friend): number => {
@@ -60,36 +61,34 @@ export default function LeaderboardPage() {
   if (!isConnected) {
     return (
       <div className="w-full max-w-md mx-auto px-4 py-8">
-        <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
-          <CardContent className="pt-6 text-center">
-            <Users className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
-            <p className="text-zinc-300">
-              Please connect your wallet to view the leaderboard
-            </p>
-          </CardContent>
-        </Card>
+        <WalletNotConnected
+          icon={Trophy}
+          title="Wallet Not Connected"
+          description="Please connect your wallet to view the leaderboard"
+          className="max-w-md"
+        />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-6 pb-20 bg-gradient-to-b from-zinc-900 via-zinc-900 to-black min-h-screen">
+    <div className="w-full max-w-md mx-auto px-4 py-6 pb-20 bg-gradient-to-b from-[var(--neutral-50)] via-[var(--neutral-100)] to-[var(--neutral-50)] min-h-screen">
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center space-x-3 mb-6">
           <div className="relative">
-            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl shadow-orange-500/25">
-              <Trophy className="h-8 w-8 text-white" />
+            <div className="w-16 h-16 bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-accent)] rounded-full flex items-center justify-center shadow-2xl shadow-[var(--brand-primary)]/25">
+              <Trophy className="h-8 w-8 text-neutral-900" />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center animate-pulse">
-              <Sparkles className="h-3 w-3 text-white" />
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-accent)] rounded-full flex items-center justify-center animate-pulse">
+              <Sparkles className="h-3 w-3 text-neutral-900" />
             </div>
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent mb-2">
-              Leaderboard
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-accent)] bg-clip-text text-transparent mb-2">
+              LEADERBOARD
             </h1>
-            <p className="text-zinc-400 text-base">
+            <p className="text-neutral-600 text-base font-medium">
               Top friends by intimacy score
             </p>
           </div>
@@ -97,25 +96,27 @@ export default function LeaderboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-700/50 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/50 shadow-lg">
-            <div className="text-2xl font-bold text-amber-400 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border-2 border-[var(--brand-primary)]/30 shadow-lg">
+            <div className="text-2xl font-bold text-[var(--brand-primary)] mb-1">
               {topFriends.length}
             </div>
-            <div className="text-xs text-zinc-400 font-medium">
+            <div className="text-xs text-neutral-600 font-medium">
               Total Ranked
             </div>
           </div>
-          <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-700/50 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/50 shadow-lg">
-            <div className="text-2xl font-bold text-cyan-400 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border-2 border-[var(--brand-secondary)]/30 shadow-lg">
+            <div className="text-2xl font-bold text-[var(--brand-secondary)] mb-1">
               {friends.filter((f) => f.isFavorite).length}
             </div>
-            <div className="text-xs text-zinc-400 font-medium">Favorites</div>
+            <div className="text-xs text-neutral-600 font-medium">
+              Favorites
+            </div>
           </div>
-          <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-700/50 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/50 shadow-lg">
-            <div className="text-2xl font-bold text-emerald-400 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border-2 border-[var(--brand-accent)]/30 shadow-lg">
+            <div className="text-2xl font-bold text-[var(--brand-accent)] mb-1">
               {friends.filter((f) => f.nickname).length}
             </div>
-            <div className="text-xs text-zinc-400 font-medium">
+            <div className="text-xs text-neutral-600 font-medium">
               With Nicknames
             </div>
           </div>
@@ -131,30 +132,30 @@ export default function LeaderboardPage() {
             return (
               <Card
                 key={friend.id}
-                className="bg-gradient-to-r from-zinc-800/80 to-zinc-700/80 backdrop-blur-sm border-zinc-600/50 hover:border-zinc-500/70 hover:shadow-2xl hover:shadow-zinc-900/30 transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden"
+                className="bg-white/95 backdrop-blur-sm border-2 border-[var(--brand-primary)]/30 hover:border-[var(--brand-primary)]/50 hover:shadow-xl hover:shadow-[var(--brand-primary)]/20 transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden"
               >
                 <CardContent className="p-5">
                   <div className="flex items-center space-x-5">
                     {/* Rank Badge */}
                     <div className="flex-shrink-0">
                       {index === 0 && (
-                        <div className="w-16 h-16 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-2xl shadow-orange-500/30 relative">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-accent)] rounded-full flex items-center justify-center text-neutral-900 text-2xl font-bold shadow-2xl shadow-[var(--brand-primary)]/30 relative">
                           <Crown className="w-7 h-7" />
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-ping"></div>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-accent)] rounded-full animate-ping"></div>
                         </div>
                       )}
                       {index === 1 && (
-                        <div className="w-16 h-16 bg-gradient-to-br from-zinc-300 via-zinc-400 to-zinc-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-2xl shadow-zinc-400/30">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[var(--brand-secondary)] to-[var(--brand-accent)] rounded-full flex items-center justify-center text-neutral-900 text-2xl font-bold shadow-2xl shadow-[var(--brand-secondary)]/30">
                           <Trophy className="w-7 h-7" />
                         </div>
                       )}
                       {index === 2 && (
-                        <div className="w-16 h-16 bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-2xl shadow-amber-600/30">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[var(--brand-accent)] to-[var(--brand-secondary)] rounded-full flex items-center justify-center text-neutral-900 text-2xl font-bold shadow-2xl shadow-[var(--brand-accent)]/30">
                           <Star className="w-7 h-7" />
                         </div>
                       )}
                       {index > 2 && (
-                        <div className="w-16 h-16 bg-gradient-to-br from-zinc-600 via-zinc-700 to-zinc-800 rounded-full flex items-center justify-center text-white text-xl font-bold border-2 border-zinc-500/50 shadow-lg">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[var(--neutral-200)] to-[var(--neutral-300)] rounded-full flex items-center justify-center text-neutral-700 text-xl font-bold border-2 border-[var(--neutral-400)]/50 shadow-lg">
                           #{index + 1}
                         </div>
                       )}
@@ -164,23 +165,23 @@ export default function LeaderboardPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-3 mb-2">
                         {friend.nickname && (
-                          <span className="font-bold text-xl text-white">
+                          <span className="font-bold text-xl text-neutral-900">
                             {friend.nickname}
                           </span>
                         )}
                         {friend.isFavorite && (
-                          <div className="w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                            <Star className="h-3 w-3 text-white fill-current" />
+                          <div className="w-6 h-6 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] rounded-full flex items-center justify-center">
+                            <Star className="h-3 w-3 text-neutral-900 fill-current" />
                           </div>
                         )}
                       </div>
-                      <div className="text-sm text-zinc-300 space-y-1">
-                        <div className="font-mono text-xs bg-zinc-800/50 px-2 py-1 rounded-md inline-block">
+                      <div className="text-sm text-neutral-600 space-y-1">
+                        <div className="font-mono text-xs bg-neutral-100/80 px-2 py-1 rounded-md inline-block border border-neutral-200/50">
                           {friend.address.slice(0, 6)}...
                           {friend.address.slice(-4)}
                         </div>
                         {friend.basename && (
-                          <div className="text-xs text-cyan-400 font-medium bg-cyan-900/20 px-2 py-1 rounded-md inline-block">
+                          <div className="text-xs text-[var(--brand-accent)] font-medium bg-[var(--brand-accent)]/10 px-2 py-1 rounded-md inline-block border border-[var(--brand-accent)]/20">
                             {friend.basename}
                           </div>
                         )}
@@ -190,15 +191,15 @@ export default function LeaderboardPage() {
                     {/* Intimacy Score */}
                     <div className="flex-shrink-0 text-right">
                       <div className="flex items-center justify-end space-x-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-emerald-400" />
-                        <span className="text-sm text-zinc-400 font-medium">
+                        <TrendingUp className="h-4 w-4 text-[var(--brand-accent)]" />
+                        <span className="text-sm text-neutral-600 font-medium">
                           Score
                         </span>
                       </div>
-                      <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-1">
+                      <div className="text-3xl font-bold bg-gradient-to-r from-[var(--brand-accent)] to-[var(--brand-secondary)] bg-clip-text text-transparent mb-1">
                         {intimacyScore}
                       </div>
-                      <div className="text-xs text-zinc-500 font-medium">
+                      <div className="text-xs text-neutral-500 font-medium">
                         {index === 0
                           ? "Champion"
                           : index === 1
@@ -215,17 +216,17 @@ export default function LeaderboardPage() {
           })}
         </div>
       ) : (
-        <Card className="bg-gradient-to-br from-zinc-800/80 to-zinc-700/80 backdrop-blur-sm border-zinc-600/50 rounded-xl">
+        <Card className="bg-white/95 backdrop-blur-sm border-2 border-[var(--brand-primary)]/30 rounded-xl shadow-lg">
           <CardContent className="pt-8 text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-zinc-600 to-zinc-700 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Trophy className="h-10 w-10 text-zinc-400" />
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-secondary)]/20 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-[var(--brand-primary)]/30">
+              <Trophy className="h-10 w-10 text-[var(--brand-primary)]" />
             </div>
-            <p className="text-zinc-300 text-lg mb-6 font-medium">
+            <p className="text-neutral-700 text-lg mb-6 font-medium">
               No friends added yet
             </p>
             <Button
               onClick={() => (window.location.href = "/friends")}
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 px-8 py-3 rounded-xl font-medium shadow-lg shadow-cyan-500/25"
+              className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] hover:from-[var(--brand-primary-dark)] hover:to-[var(--brand-secondary-dark)] text-neutral-900 border-0 px-8 py-3 rounded-xl font-medium shadow-lg shadow-[var(--brand-primary)]/25"
             >
               <Users className="mr-2 h-5 w-5" />
               Add Friends
@@ -236,15 +237,15 @@ export default function LeaderboardPage() {
 
       {/* Footer Stats */}
       {topFriends.length > 0 && (
-        <div className="mt-10 p-6 bg-gradient-to-r from-zinc-800/60 to-zinc-700/60 backdrop-blur-sm rounded-2xl border border-zinc-600/50 shadow-xl">
+        <div className="mt-10 p-6 bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-[var(--brand-primary)]/20 shadow-xl">
           <div className="text-center">
-            <div className="text-sm text-zinc-400 mb-3 font-medium">
+            <div className="text-sm text-neutral-600 mb-3 font-medium">
               Leaderboard powered by
             </div>
-            <div className="text-xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent mb-2">
+            <div className="text-xl font-bold bg-gradient-to-r from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-accent)] bg-clip-text text-transparent mb-2">
               Intimacy Algorithm
             </div>
-            <div className="text-xs text-zinc-500 font-medium">
+            <div className="text-xs text-neutral-500 font-medium">
               Based on favorites, nicknames, Base domains & time
             </div>
           </div>

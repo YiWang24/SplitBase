@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import WalletNotConnected from "@/app/components/ui/wallet-not-connected";
 
 import {
   Search,
@@ -24,6 +25,7 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
+  Crown,
 } from "lucide-react";
 import { Friend, AddFriendInput } from "@/lib/types";
 import {
@@ -46,6 +48,7 @@ interface FriendModalProps {
   friend?: Friend | null;
   onSubmit: (data: AddFriendInput & { isFavorite?: boolean }) => void;
   existingAddresses: string[];
+  currentUserAddress?: string;
 }
 
 function FriendModal({
@@ -55,6 +58,7 @@ function FriendModal({
   friend,
   onSubmit,
   existingAddresses,
+  currentUserAddress,
 }: FriendModalProps) {
   const [formData, setFormData] = useState<
     AddFriendInput & { isFavorite?: boolean }
@@ -94,11 +98,24 @@ function FriendModal({
         setAddressError("Please enter a valid Ethereum address");
       } else if (
         mode === "add" &&
+        currentUserAddress &&
+        trimmedAddress.toLowerCase() === currentUserAddress.toLowerCase()
+      ) {
+        setAddressError("You cannot add your own wallet address");
+      } else if (
+        mode === "add" &&
         existingAddresses.some(
           (addr) => addr.toLowerCase() === trimmedAddress.toLowerCase(),
         )
       ) {
         setAddressError("This address is already in your friends list");
+      } else if (
+        mode === "edit" &&
+        friend &&
+        currentUserAddress &&
+        trimmedAddress.toLowerCase() === currentUserAddress.toLowerCase()
+      ) {
+        setAddressError("You cannot use your own wallet address");
       } else if (
         mode === "edit" &&
         friend &&
@@ -115,7 +132,7 @@ function FriendModal({
     } else {
       setAddressError("");
     }
-  }, [formData.address, existingAddresses, mode, friend]);
+  }, [formData.address, existingAddresses, mode, friend, currentUserAddress]);
 
   const handleSubmit = () => {
     if (!formData.address.trim() || addressError) return;
@@ -136,20 +153,28 @@ function FriendModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "add" ? "Add New Friend" : "Edit Friend"}
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-[#fefce8] border-2 border-[#c9e265]/20 shadow-2xl">
+        <DialogHeader className="text-center pb-4">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#c9e265] to-[#89d957] rounded-2xl flex items-center justify-center shadow-lg mb-4">
+            <UserPlus className="h-8 w-8 text-neutral-900" />
+          </div>
+          <DialogTitle className="text-2xl font-black text-neutral-900 tracking-wide">
+            {mode === "add" ? "ADD NEW FRIEND" : "EDIT FRIEND"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base text-neutral-600 font-medium">
             {mode === "add"
               ? "Enter your friend's wallet address and details"
               : "Update your friend's information"}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-6 py-4">
           <div>
-            <Label htmlFor="modal-address">Wallet Address *</Label>
+            <Label
+              htmlFor="modal-address"
+              className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+            >
+              WALLET ADDRESS *
+            </Label>
             <Input
               id="modal-address"
               placeholder="0x..."
@@ -157,19 +182,26 @@ function FriendModal({
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className={
-                addressError ? "border-red-500 focus:border-red-500" : ""
-              }
+              className={`mt-2 h-12 border-2 transition-all duration-300 rounded-xl ${
+                addressError
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-[#c9e265]/20 focus:border-[#c9e265] focus:ring-[#c9e265]/20"
+              }`}
             />
             {addressError && (
-              <div className="flex items-center space-x-2 mt-1 text-sm text-red-500">
+              <div className="flex items-center space-x-2 mt-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
                 <AlertCircle className="h-4 w-4" />
-                <span>{addressError}</span>
+                <span className="font-medium">{addressError}</span>
               </div>
             )}
           </div>
           <div>
-            <Label htmlFor="modal-nickname">Nickname (Optional)</Label>
+            <Label
+              htmlFor="modal-nickname"
+              className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+            >
+              NICKNAME (OPTIONAL)
+            </Label>
             <Input
               id="modal-nickname"
               placeholder="Johnny"
@@ -177,10 +209,11 @@ function FriendModal({
               onChange={(e) =>
                 setFormData({ ...formData, nickname: e.target.value })
               }
+              className="mt-2 h-12 border-2 border-[#89d957]/20 focus:border-[#89d957] focus:ring-[#89d957]/20 transition-all duration-300 rounded-xl"
             />
           </div>
           {mode === "edit" && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-gradient-to-r from-[#c9e265]/10 to-[#89d957]/10 p-4 rounded-xl border border-[#c9e265]/20">
               <input
                 type="checkbox"
                 id="modal-favorite"
@@ -188,9 +221,14 @@ function FriendModal({
                 onChange={(e) =>
                   setFormData({ ...formData, isFavorite: e.target.checked })
                 }
-                className="rounded"
+                className="w-5 h-5 rounded border-2 border-[#c9e265] text-[#c9e265] focus:ring-[#c9e265]/20"
               />
-              <Label htmlFor="modal-favorite">Mark as favorite</Label>
+              <Label
+                htmlFor="modal-favorite"
+                className="text-sm font-bold text-neutral-700"
+              >
+                Mark as favorite
+              </Label>
             </div>
           )}
         </div>
@@ -198,14 +236,14 @@ function FriendModal({
           <Button
             onClick={handleSubmit}
             disabled={!!addressError || !formData.address.trim()}
-            className="min-w-[120px]"
+            className="min-w-[120px] h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0"
           >
             {mode === "add" ? "Add Friend" : "Update Friend"}
           </Button>
           <Button
             variant="outline"
             onClick={handleClose}
-            className="min-w-[120px]"
+            className="min-w-[120px] h-12 border-2 border-neutral-300 text-neutral-600 font-bold hover:bg-neutral-50 transition-all duration-300"
           >
             Cancel
           </Button>
@@ -363,44 +401,43 @@ export default function FriendsPage() {
 
   if (!isConnected) {
     return (
-      <div className="w-full max-w-md mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
-              Please connect your wallet to manage friends
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <WalletNotConnected
+        icon={Users}
+        title="Wallet Not Connected"
+        description="Please connect your wallet to manage friends"
+      />
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-6 pb-20">
+    <div className="w-full max-w-4xl mx-auto px-4 py-6 pb-20">
       {/* Toast Notifications */}
       {toast && (
-        <div className="mb-4">
+        <div className="mb-6">
           <div
-            className={`flex items-center justify-between p-3 rounded-lg border ${
+            className={`flex items-center justify-between p-4 rounded-xl border-2 shadow-lg ${
               toast.type === "success"
-                ? "bg-green-50 border-green-200 text-green-800"
-                : "bg-red-50 border-red-200 text-red-800"
+                ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-800"
+                : "bg-gradient-to-r from-red-50 to-pink-50 border-red-200 text-red-800"
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               {toast.type === "success" ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
               ) : (
-                <AlertCircle className="h-4 w-4 text-red-600" />
+                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-white" />
+                </div>
               )}
-              <span className="text-sm font-medium">{toast.message}</span>
+              <span className="text-sm font-bold">{toast.message}</span>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setToast(null)}
-              className="h-6 w-6 p-0 hover:bg-transparent"
+              className="h-8 w-8 p-0 hover:bg-transparent"
             >
               ×
             </Button>
@@ -408,30 +445,38 @@ export default function FriendsPage() {
         </div>
       )}
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Friends</h1>
-        <p className="text-muted-foreground">
+      {/* Header Section */}
+      <div className="mb-6 text-center">
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#c9e265] to-[#89d957] rounded-2xl flex items-center justify-center shadow-lg mb-4">
+          <Users className="h-8 w-8 text-neutral-900" />
+        </div>
+        <h1 className="text-2xl font-black text-neutral-900 tracking-wide mb-2">
+          FRIENDS
+        </h1>
+        <p className="text-sm text-neutral-600 font-medium max-w-md mx-auto">
           Manage your contacts for easy bill splitting
         </p>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-4">
+      {/* Search and Add Section */}
+      <div className="mb-6 space-y-3">
+        {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <Input
             placeholder="Search friends..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-12 border-2 border-[#c9e265]/20 focus:border-[#c9e265] focus:ring-[#c9e265]/20 transition-all duration-300 rounded-xl text-base placeholder:text-neutral-400 placeholder:font-medium"
           />
         </div>
-      </div>
 
-      {/* Add Friend Button */}
-      <div className="mb-6">
-        <Button onClick={openAddModal} className="w-full" size="lg">
-          <UserPlus className="mr-2 h-4 w-4" />
+        {/* Add Friend Button */}
+        <Button
+          onClick={openAddModal}
+          className="w-full h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0"
+        >
+          <UserPlus className="mr-2 h-5 w-5" />
           Add New Friend
         </Button>
       </div>
@@ -444,18 +489,23 @@ export default function FriendsPage() {
         friend={editingFriend}
         onSubmit={handleModalSubmit}
         existingAddresses={existingAddresses}
+        currentUserAddress={address}
       />
 
       {/* Friends List */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Favorite Friends */}
         {favoriteFriends.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center">
-              <Star className="h-4 w-4 mr-2 text-yellow-500" />
-              Favorites ({favoriteFriends.length})
-            </h3>
-            <div className="space-y-2">
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-gradient-to-r from-[#c9e265]/20 to-[#89d957]/20 px-4 py-2 rounded-xl border-2 border-[#c9e265]/30">
+                <h3 className="text-base font-black text-neutral-900 tracking-wide flex items-center">
+                  <Crown className="h-4 w-4 mr-2 text-yellow-500" />
+                  FAVORITE FRIENDS ({favoriteFriends.length})
+                </h3>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
               {favoriteFriends.map((friend) => (
                 <FriendCard
                   key={friend.id}
@@ -475,10 +525,15 @@ export default function FriendsPage() {
         {/* Regular Friends */}
         {regularFriends.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-              All Friends ({regularFriends.length})
-            </h3>
-            <div className="space-y-2">
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-gradient-to-r from-neutral-100 to-neutral-200 px-4 py-2 rounded-xl border-2 border-neutral-300">
+                <h3 className="text-base font-black text-neutral-700 tracking-wide flex items-center">
+                  <Users className="h-4 w-4 mr-3 text-neutral-500" />
+                  ALL FRIENDS ({regularFriends.length})
+                </h3>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
               {regularFriends.map((friend) => (
                 <FriendCard
                   key={friend.id}
@@ -497,12 +552,23 @@ export default function FriendsPage() {
 
         {/* Empty State */}
         {friends.length === 0 && (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">No friends added yet</p>
-              <Button onClick={openAddModal}>
-                <UserPlus className="mr-2 h-4 w-4" />
+          <Card className="bg-gradient-to-br from-white/95 to-[#c9e265]/5 border-0 shadow-xl">
+            <CardContent className="pt-16 pb-16 text-center">
+              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#c9e265]/20 to-[#89d957]/20 rounded-3xl flex items-center justify-center mb-8">
+                <Users className="h-12 w-12 text-[#89d957]" />
+              </div>
+              <h2 className="text-2xl font-bold text-neutral-700 mb-4">
+                No Friends Added Yet
+              </h2>
+              <p className="text-neutral-600 font-medium mb-8 max-w-md mx-auto">
+                Start building your network by adding your first friend.
+                You&apos;ll be able to split bills and manage payments together!
+              </p>
+              <Button
+                onClick={openAddModal}
+                className="h-14 px-8 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 text-lg"
+              >
+                <UserPlus className="mr-3 h-6 w-6" />
                 Add Your First Friend
               </Button>
             </CardContent>
@@ -533,57 +599,73 @@ function FriendCard({
   isDeleting,
 }: FriendCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
+    <Card className="bg-white/80 backdrop-blur-sm border-2 border-[#c9e265]/20 shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden group">
+      <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 flex-1">
-            <Avatar
-              className="h-10 w-10"
-              address={friend.address as `0x${string}`}
-            />
+          <div className="flex items-center space-x-4 flex-1">
+            <div className="relative">
+              <Avatar
+                className="h-14 w-14 ring-2 ring-[#c9e265]/20 group-hover:ring-[#c9e265] transition-all duration-300"
+                address={friend.address as `0x${string}`}
+              />
+              {friend.isFavorite && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Star className="h-3 w-3 text-white fill-current" />
+                </div>
+              )}
+            </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2 mb-1">
+              <div className="flex items-center space-x-3 mb-2">
                 {friend.nickname && (
-                  <span className="font-medium text-sm">{friend.nickname}</span>
+                  <span className="font-bold text-lg text-neutral-900">
+                    {friend.nickname}
+                  </span>
                 )}
                 {friend.isFavorite && (
-                  <Star className="h-3 w-3 text-yellow-500" />
+                  <div className="px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-md">
+                    FAVORITE
+                  </div>
                 )}
               </div>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <div className="font-mono">
-                  {friend.address.slice(0, 6)}...{friend.address.slice(-4)}
-                </div>
+              <div className="text-sm text-neutral-600 font-mono bg-neutral-100 px-3 py-2 rounded-lg">
+                {friend.address.slice(0, 8)}...{friend.address.slice(-6)}
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-1">
+
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={onToggleFavorite}
-              className="h-8 w-8 p-0"
+              className={`h-10 w-10 p-0 rounded-full transition-all duration-300 ${
+                friend.isFavorite
+                  ? "text-yellow-500 hover:bg-yellow-50"
+                  : "text-neutral-400 hover:text-yellow-500 hover:bg-yellow-50"
+              }`}
             >
               <Star
-                className={`h-4 w-4 ${friend.isFavorite ? "text-yellow-500 fill-current" : "text-muted-foreground"}`}
+                className={`h-5 w-5 ${friend.isFavorite ? "fill-current" : ""}`}
               />
             </Button>
+
             <Button
               variant="ghost"
               size="sm"
               onClick={onEdit}
-              className="h-8 w-8 p-0"
+              className="h-10 w-10 p-0 text-[#89d957] hover:bg-[#89d957]/10 rounded-full transition-all duration-300"
             >
-              <Edit className="h-4 w-4 text-muted-foreground" />
+              <Edit className="h-5 w-5" />
             </Button>
+
             {isDeleting ? (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onConfirmDelete}
-                  className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="h-10 px-4 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full font-bold transition-all duration-300"
                 >
                   Confirm
                 </Button>
@@ -591,7 +673,7 @@ function FriendCard({
                   variant="ghost"
                   size="sm"
                   onClick={onCancelDelete}
-                  className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  className="h-10 px-4 text-sm text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-full font-bold transition-all duration-300"
                 >
                   Cancel
                 </Button>
@@ -601,9 +683,9 @@ function FriendCard({
                 variant="ghost"
                 size="sm"
                 onClick={onDelete}
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                className="h-10 w-10 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-300"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-5 w-5" />
               </Button>
             )}
           </div>

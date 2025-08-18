@@ -68,7 +68,7 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
     );
   }
 
-  // 计算实际参与者数量
+  // Calculate actual participant count
   let actualParticipantCount = input.participantCount;
   if (input.selectedFriends && input.selectedFriends.length > 0) {
     actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
@@ -107,24 +107,24 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
 }
 
 /**
- * 验证以太坊地址格式
+ * Validate Ethereum address format
  */
 export function isValidEthereumAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
 /**
- * 创建新的分账
+ * Create a new split bill
  */
 export function createSplitBill(input: CreateSplitBillInput): SplitBill {
   const validation = validateSplitBillInput(input);
   if (!validation.isValid) {
-    throw new Error(`创建分账失败: ${validation.errors.join(", ")}`);
+    throw new Error(`Failed to create split: ${validation.errors.join(", ")}`);
   }
 
   const billId = generateBillId();
 
-  // 计算实际参与者数量和每人金额
+  // Calculate actual participant count and per-person amount
   let actualParticipantCount = input.participantCount;
   if (input.selectedFriends && input.selectedFriends.length > 0) {
     actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
@@ -141,7 +141,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     description: input.description?.trim(),
     totalAmount: input.totalAmount,
     currency: "USDC",
-    participantCount: actualParticipantCount, // 使用实际参与者数量
+    participantCount: actualParticipantCount, // Use actual participant count
     amountPerPerson,
     creatorAddress: input.creatorAddress,
     creatorBasename: input.creatorBasename,
@@ -152,7 +152,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     shareUrl: generateShareUrl(billId),
   };
 
-  // 将创建者添加为参与者（状态为已支付，因为创建者不需要支付）
+  // Add creator as a participant (status paid, since creator does not pay)
   let updatedBill = addCreatorAsParticipant(
     bill,
     input.creatorAddress,
@@ -160,7 +160,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     input.creatorBasename || "Creator",
   );
 
-  // 如果有选中的好友，自动添加为参与者
+  // If there are selected friends, add them as participants automatically
   if (input.selectedFriends && input.selectedFriends.length > 0) {
     for (const friend of input.selectedFriends) {
       try {
@@ -180,7 +180,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
 }
 
 /**
- * 生成分享链接
+ * Generate share URL
  */
 export function generateShareUrl(billId: string): string {
   const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
@@ -188,7 +188,7 @@ export function generateShareUrl(billId: string): string {
 }
 
 /**
- * 添加创建者作为参与者（状态为已支付）
+ * Add creator as a participant (status: paid)
  */
 export function addCreatorAsParticipant(
   bill: SplitBill,
@@ -196,17 +196,17 @@ export function addCreatorAsParticipant(
   basename?: string,
   displayName?: string,
 ): SplitBill {
-  // 检查是否已经参与
+  // Check if already joined
   const existingParticipant = bill.participants.find(
     (p) => p.address.toLowerCase() === address.toLowerCase(),
   );
   if (existingParticipant) {
-    throw new Error("该地址已参与此分账");
+    throw new Error("This address has already joined this split");
   }
 
-  // 验证地址
+  // Validate address
   if (!isValidEthereumAddress(address)) {
-    throw new Error("无效的以太坊地址");
+    throw new Error("Invalid Ethereum address");
   }
 
   const participant: Participant = {
@@ -218,7 +218,7 @@ export function addCreatorAsParticipant(
       basename ||
       `${address.slice(0, 6)}...${address.slice(-4)}`,
     amount: bill.amountPerPerson,
-    status: "paid", // 创建者状态为已支付
+    status: "paid", // Creator is marked as paid
   };
 
   const updatedBill: SplitBill = {
@@ -231,7 +231,7 @@ export function addCreatorAsParticipant(
 }
 
 /**
- * 添加参与者到分账
+ * Add participant to split
  */
 export function addParticipant(
   bill: SplitBill,
@@ -239,22 +239,22 @@ export function addParticipant(
   basename?: string,
   displayName?: string,
 ): SplitBill {
-  // 检查是否已经参与
+  // Check if already joined
   const existingParticipant = bill.participants.find(
     (p) => p.address.toLowerCase() === address.toLowerCase(),
   );
   if (existingParticipant) {
-    throw new Error("该地址已参与此分账");
+    throw new Error("This address has already joined this split");
   }
 
-  // 检查是否已满
+  // Check if full
   if (bill.participants.length >= bill.participantCount) {
-    throw new Error("分账已满，无法添加更多参与者");
+    throw new Error("Split is full; cannot add more participants");
   }
 
-  // 验证地址
+  // Validate address
   if (!isValidEthereumAddress(address)) {
-    throw new Error("无效的以太坊地址");
+    throw new Error("Invalid Ethereum address");
   }
 
   const participant: Participant = {
@@ -279,7 +279,7 @@ export function addParticipant(
 }
 
 /**
- * 更新参与者支付状态
+ * Update participant payment status
  */
 export function updateParticipantPayment(
   bill: SplitBill,
@@ -291,7 +291,7 @@ export function updateParticipantPayment(
     (p) => p.id === participantId,
   );
   if (participantIndex === -1) {
-    throw new Error("未找到指定参与者");
+    throw new Error("Specified participant not found");
   }
 
   const updatedParticipants = [...bill.participants];
@@ -308,7 +308,7 @@ export function updateParticipantPayment(
     updatedAt: new Date(),
   };
 
-  // 检查是否所有人都已支付
+  // Check if everyone has paid
   const allPaid = updatedBill.participants.every(
     (p) => p.status === "paid" || p.status === "confirmed",
   );
@@ -323,7 +323,7 @@ export function updateParticipantPayment(
 }
 
 /**
- * 计算分账统计信息
+ * Calculate split statistics
  */
 export function calculateBillStats(bill: SplitBill): SplitBillStats {
   const paidParticipants = bill.participants.filter(
@@ -357,7 +357,7 @@ export function calculateBillStats(bill: SplitBill): SplitBillStats {
 }
 
 /**
- * 格式化金额显示
+ * Format amount display
  */
 export function formatAmount(amount: string, decimals: number = 2): string {
   const num = parseFloat(amount);
@@ -365,7 +365,7 @@ export function formatAmount(amount: string, decimals: number = 2): string {
 }
 
 /**
- * 格式化地址显示
+ * Format address display
  */
 export function formatAddress(
   address: string,
@@ -379,7 +379,7 @@ export function formatAddress(
 }
 
 /**
- * 将 USDC 金额转换为 wei (考虑 6 位小数)
+ * Convert USDC amount to wei (consider 6 decimals)
  */
 export function usdcToWei(amount: string): bigint {
   const decimals = BASE_PAY_CONFIG.DECIMALS;
@@ -388,7 +388,7 @@ export function usdcToWei(amount: string): bigint {
 }
 
 /**
- * 将 wei 转换为 USDC 金额
+ * Convert wei to USDC amount
  */
 export function weiToUsdc(wei: bigint): string {
   const decimals = BASE_PAY_CONFIG.DECIMALS;
@@ -397,21 +397,21 @@ export function weiToUsdc(wei: bigint): string {
 }
 
 /**
- * 生成二维码数据 (分享链接)
+ * Generate QR code data (share URL)
  */
 export function generateQRCodeData(shareUrl: string): string {
   return shareUrl;
 }
 
 /**
- * 检查分账是否可以开始收款
+ * Check if split can start collecting payments
  */
 export function canStartCollection(bill: SplitBill): boolean {
   return bill.status === "active" && bill.participants.length >= 2;
 }
 
 /**
- * 检查用户是否可以加入分账
+ * Check if a user can join the split
  */
 export function canJoinBill(
   bill: SplitBill,
@@ -421,24 +421,24 @@ export function canJoinBill(
   reason?: string;
 } {
   if (bill.status !== "active") {
-    return { canJoin: false, reason: "分账已关闭" };
+    return { canJoin: false, reason: "Split is closed" };
   }
 
   if (bill.participants.length >= bill.participantCount) {
-    return { canJoin: false, reason: "分账已满" };
+    return { canJoin: false, reason: "Split is full" };
   }
 
   const isCreator =
     bill.creatorAddress.toLowerCase() === userAddress.toLowerCase();
   if (isCreator) {
-    return { canJoin: false, reason: "创建者不能参与支付" };
+    return { canJoin: false, reason: "Creator cannot join payment" };
   }
 
   const alreadyJoined = bill.participants.some(
     (p) => p.address.toLowerCase() === userAddress.toLowerCase(),
   );
   if (alreadyJoined) {
-    return { canJoin: false, reason: "您已参与此分账" };
+    return { canJoin: false, reason: "You have already joined this split" };
   }
 
   return { canJoin: true };

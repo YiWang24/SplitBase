@@ -9,7 +9,7 @@ import {
   IdentityCard,
 } from "@coinbase/onchainkit/identity";
 
-import { Copy, ExternalLink, LogOut } from "lucide-react";
+import { Copy, ExternalLink, LogOut, CheckCircle, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -29,6 +28,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [mounted, setMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -45,7 +45,8 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
     if (address) {
       try {
         await navigator.clipboard.writeText(address);
-        // You could add a toast notification here
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
       } catch (error) {
         console.error("Failed to copy address:", error);
       }
@@ -54,9 +55,12 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-mono tracking-wider">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-[#fefce8] border-2 border-[#c9e265]/20 shadow-2xl">
+        <DialogHeader className="text-center pb-4">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#c9e265] to-[#89d957] rounded-2xl flex items-center justify-center shadow-lg mb-4">
+            <Wallet className="h-8 w-8 text-neutral-900" />
+          </div>
+          <DialogTitle className="text-2xl font-black text-neutral-900 tracking-wide">
             WALLET INFO
           </DialogTitle>
         </DialogHeader>
@@ -64,63 +68,84 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
         {isConnected ? (
           <div className="space-y-6">
             {/* Identity Component */}
-
-            <IdentityCard
-              address={address}
-              schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
-              className=" space-x-2 bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
-              badgeTooltip={true}
-            />
-
-            <Separator />
-
-            {/* Address */}
-            <Card>
+            <Card className="bg-gradient-to-br from-white/90 to-[#c9e265]/5 border-2 border-[#c9e265]/20 shadow-lg">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Address</CardTitle>
+                <CardTitle className="text-sm font-bold text-neutral-700 uppercase tracking-wide flex items-center">
+                  <Wallet className="h-4 w-4 mr-2 text-[#89d957]" />
+                  IDENTITY
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="flex items-center justify-between">
+                <IdentityCard
+                  address={address}
+                  schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+                  className="w-full bg-white/80 backdrop-blur-sm border-2 border-[#c9e265]/20 rounded-xl px-4 py-3 shadow-md"
+                  badgeTooltip={true}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Address */}
+            <Card className="bg-gradient-to-br from-white/90 to-[#c9e265]/5 border-2 border-[#c9e265]/20 shadow-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-bold text-neutral-700 uppercase tracking-wide">
+                  WALLET ADDRESS
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between space-x-3">
                   <div className="flex-1 min-w-0">
                     <Identity
                       address={address}
                       schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
-                      className="text-sm font-mono text-muted-foreground truncate bg-inherit border-stone-200 border-2 rounded-lg px-2 py-1"
+                      className="w-full text-sm font-mono text-neutral-800 bg-white/70 border-2 border-[#c9e265]/20 rounded-xl px-4 py-3 shadow-sm"
                     >
-                      <Address/>
+                      <Address />
                     </Identity>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleCopyAddress}
-                    className="ml-2"
+                    className={`h-12 w-12 p-0 rounded-xl transition-all duration-300 ${
+                      copied
+                        ? "bg-green-100 text-green-600 hover:bg-green-200"
+                        : "text-[#89d957] hover:bg-[#89d957]/10 hover:text-[#89d957]"
+                    }`}
                   >
-                    <Copy className="h-4 w-4" />
+                    {copied ? (
+                      <CheckCircle className="h-5 w-5" />
+                    ) : (
+                      <Copy className="h-5 w-5" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Balance */}
-            <Card>
+            <Card className="bg-gradient-to-br from-white/90 to-[#c9e265]/5 border-2 border-[#c9e265]/20 shadow-lg">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Balance</CardTitle>
+                <CardTitle className="text-sm font-bold text-neutral-700 uppercase tracking-wide">
+                  ETH BALANCE
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <EthBalance
-                  address={address}
-                  className="text-lg font-semibold text-primary"
-                />
+                <div className="bg-white/80 backdrop-blur-sm border-2 border-[#c9e265]/20 rounded-xl px-4 py-3 shadow-sm">
+                  <EthBalance
+                    address={address}
+                    className="text-xl font-bold text-neutral-900"
+                  />
+                </div>
               </CardContent>
             </Card>
 
             {/* Actions */}
-            <div className="space-y-3">
+            <div className="space-y-3 pt-2">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full"
+                className="w-full h-12 bg-gradient-to-r from-[#c9e265]/10 to-[#89d957]/10 border-2 border-[#c9e265]/30 text-neutral-700 font-bold hover:bg-[#c9e265]/20 hover:border-[#c9e265] hover:scale-105 transition-all duration-300 rounded-xl"
                 onClick={() => {
                   if (address) {
                     window.open(
@@ -130,24 +155,27 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                   }
                 }}
               >
-                <ExternalLink className="mr-2 h-4 w-4" />
+                <ExternalLink className="mr-3 h-5 w-5" />
                 View on BaseScan
               </Button>
 
               <Button
-                variant="destructive"
+                variant="outline"
                 size="lg"
-                className="w-full"
+                className="w-full h-12 border-2 border-red-300 text-red-600 font-bold hover:bg-red-50 hover:border-red-400 hover:scale-105 transition-all duration-300 rounded-xl"
                 onClick={handleDisconnect}
               >
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-3 h-5 w-5" />
                 Disconnect Wallet
               </Button>
             </div>
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No wallet connected</p>
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-2xl flex items-center justify-center mb-4">
+              <Wallet className="h-8 w-8 text-neutral-500" />
+            </div>
+            <p className="text-neutral-600 font-medium">No wallet connected</p>
           </div>
         )}
       </DialogContent>

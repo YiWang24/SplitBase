@@ -1,58 +1,77 @@
-/* DeFi Pixel Theme for SplitBase */
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;600;700;800&display=swap");
+/* SplitBase Brand Theme - based on theme colors #c9e265 and #89d957 */
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* DeFi Pixel Colors - Based on reference */
-  --app-background: #e8f4fd;
-  --app-foreground: #1a1a1a;
-  --app-foreground-muted: #666666;
-  --app-accent: #00bfff;
-  --app-accent-hover: #0099cc;
-  --app-accent-active: #007799;
-  --app-accent-light: rgba(0, 191, 255, 0.1);
-  --app-gray: #f8fbff;
-  --app-gray-dark: #e8f2ff;
-  --app-card-bg: rgba(255, 255, 255, 0.9);
-  --app-card-border: #00bfff;
+  /* Brand color system */
+  --brand-primary: #c9e265; /* Primary - bright yellow-green */
+  --brand-secondary: #89d957; /* Secondary - fresh green */
+  --brand-primary-light: #d7ea8a; /* Primary (light) */
+  --brand-primary-dark: #b8d14a; /* Primary (dark) */
+  --brand-secondary-light: #a0e06a; /* Secondary (light) */
+  --brand-secondary-dark: #7ac94a; /* Secondary (dark) */
+  --brand-accent: #6bbf3a; /* Accent - deep green */
+  --brand-accent-light: #8cd45a; /* Accent (light) */
 
-  /* Additional DeFi Colors */
-  --app-cyan: #00bfff;
-  --app-blue: #4da6ff;
-  --app-light-blue: #80ccff;
-  --app-dark-blue: #0080cc;
-  --app-warning: #ff8c00;
-  --app-error: #ff4757;
-  --app-success: #2ed573;
+  /* Neutral color system */
+  --neutral-50: #f8faf5; /* Lightest background */
+  --neutral-100: #f1f5ed; /* Light background */
+  --neutral-200: #e3e9d7; /* Border color */
+  --neutral-300: #cbd5b3; /* Input background */
+  --neutral-400: #a3b583; /* Disabled state */
+  --neutral-500: #7a9563; /* Secondary text */
+  --neutral-600: #5a7a4a; /* Primary text */
+  --neutral-700: #3d5f35; /* Dark text */
+  --neutral-800: #2a4528; /* Dark background */
+  --neutral-900: #1a2b1a; /* Darkest */
 
-  /* Card styling */
+  /* Semantic colors */
+  --success: #89d957;
+  --warning: #ffc107;
+  --error: #dc3545;
+  --info: #17a2b8;
+
+  /* App background and foreground */
+  --app-background: var(--neutral-50);
+  --app-foreground: var(--neutral-900);
+  --app-foreground-muted: var(--neutral-500);
+  --app-accent: var(--brand-primary);
+  --app-accent-hover: var(--brand-primary-dark);
+  --app-accent-active: var(--brand-accent);
+  --app-accent-light: rgba(201, 226, 101, 0.1);
+  --app-gray: var(--neutral-100);
+  --app-gray-dark: var(--neutral-200);
+  --app-card-bg: rgba(255, 255, 255, 0.95);
+  --app-card-border: var(--brand-primary);
+
+  /* Card styles */
   --app-card-radius: 16px;
   --app-button-radius: 12px;
 }
 
-/* Keep consistent light theme for DeFi aesthetic */
+/* Dark theme */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Use same light theme even in dark mode for consistency with reference */
-    --app-background: #e8f4fd;
-    --app-foreground: #1a1a1a;
-    --app-foreground-muted: #666666;
-    --app-accent: #00bfff;
-    --app-accent-hover: #0099cc;
-    --app-accent-active: #007799;
-    --app-accent-light: rgba(0, 191, 255, 0.1);
-    --app-gray: #f8fbff;
-    --app-gray-dark: #e8f2ff;
-    --app-card-bg: rgba(255, 255, 255, 0.9);
-    --app-card-border: #00bfff;
+    --app-background: var(--neutral-900);
+    --app-foreground: var(--neutral-50);
+    --app-foreground-muted: var(--neutral-400);
+    --app-accent: var(--brand-primary);
+    --app-accent-hover: var(--brand-primary-light);
+    --app-accent-active: var(--brand-secondary);
+    --app-accent-light: rgba(201, 226, 101, 0.15);
+    --app-gray: var(--neutral-800);
+    --app-gray-dark: var(--neutral-700);
+    --app-card-bg: rgba(42, 69, 40, 0.95);
+    --app-card-border: var(--brand-primary);
   }
 }
 
 .mini-app-theme {
-  --ock-font-family: "Press Start 2P", "Orbitron", monospace;
+  --ock-font-family:
+    "Pixelify Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --ock-border-radius: var(--app-card-radius);
   --ock-border-radius-inner: var(--app-button-radius);
 
@@ -60,11 +79,11 @@
   --ock-text-inverse: var(--app-background);
   --ock-text-foreground: var(--app-foreground);
   --ock-text-foreground-muted: var(--app-foreground-muted);
-  --ock-text-error: var(--app-error);
-  --ock-text-primary: var(--app-accent);
-  --ock-text-success: var(--app-success);
-  --ock-text-warning: var(--app-warning);
-  --ock-text-disabled: #666688;
+  --ock-text-error: var(--error);
+  --ock-text-primary: var(--brand-primary);
+  --ock-text-success: var(--success);
+  --ock-text-warning: var(--warning);
+  --ock-text-disabled: var(--neutral-400);
 
   /* Background colors */
   --ock-bg-default: var(--app-background);
@@ -74,43 +93,45 @@
   --ock-bg-alternate-hover: var(--app-gray-dark);
   --ock-bg-alternate-active: var(--app-gray-dark);
   --ock-bg-inverse: var(--app-foreground);
-  --ock-bg-inverse-hover: #22ff99;
-  --ock-bg-inverse-active: #44ffaa;
-  --ock-bg-primary: var(--app-accent);
-  --ock-bg-primary-hover: var(--app-accent-hover);
-  --ock-bg-primary-active: var(--app-accent-active);
+  --ock-bg-inverse-hover: var(--brand-secondary);
+  --ock-bg-inverse-active: var(--brand-accent);
+  --ock-bg-primary: var(--brand-primary);
+  --ock-bg-primary-hover: var(--brand-primary-dark);
+  --ock-bg-primary-active: var(--brand-accent);
   --ock-bg-primary-washed: var(--app-accent-light);
-  --ock-bg-primary-disabled: #664466;
+  --ock-bg-primary-disabled: var(--neutral-400);
   --ock-bg-secondary: var(--app-gray);
   --ock-bg-secondary-hover: var(--app-gray-dark);
-  --ock-bg-secondary-active: #3a3a5a;
-  --ock-bg-error: rgba(255, 68, 68, 0.2);
-  --ock-bg-warning: rgba(255, 170, 0, 0.2);
-  --ock-bg-success: rgba(68, 255, 136, 0.2);
+  --ock-bg-secondary-active: var(--neutral-700);
+  --ock-bg-error: rgba(220, 53, 69, 0.1);
+  --ock-bg-warning: rgba(255, 193, 7, 0.1);
+  --ock-bg-success: rgba(137, 217, 87, 0.1);
   --ock-bg-default-reverse: var(--app-foreground);
 
   /* Icon colors */
-  --ock-icon-color-primary: var(--app-accent);
+  --ock-icon-color-primary: var(--brand-primary);
   --ock-icon-color-foreground: var(--app-foreground);
   --ock-icon-color-foreground-muted: var(--app-foreground-muted);
   --ock-icon-color-inverse: var(--app-background);
-  --ock-icon-color-error: var(--app-error);
-  --ock-icon-color-success: var(--app-success);
-  --ock-icon-color-warning: var(--app-warning);
+  --ock-icon-color-error: var(--error);
+  --ock-icon-color-success: var(--success);
+  --ock-icon-color-warning: var(--warning);
 
   /* Line colors */
-  --ock-line-primary: var(--app-accent);
+  --ock-line-primary: var(--brand-primary);
   --ock-line-default: var(--app-card-border);
   --ock-line-heavy: var(--app-foreground-muted);
   --ock-line-inverse: var(--app-foreground);
 
-  /* Apply pixel DeFi styling */
+  /* App brand theme styles */
   font-family: var(--ock-font-family);
-  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 50%, #e8f4fd 100%);
+  background: linear-gradient(
+    135deg,
+    var(--neutral-50) 0%,
+    var(--neutral-100) 50%,
+    var(--neutral-50) 100%
+  );
   min-height: 100vh;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
 }
 
 * {
@@ -119,12 +140,21 @@
 
 body {
   color: var(--app-foreground);
-  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 50%, #e8f4fd 100%);
-  font-family: "Press Start 2P", "Orbitron", monospace;
+  background: linear-gradient(
+    135deg,
+    var(--neutral-50) 0%,
+    var(--neutral-100) 50%,
+    var(--neutral-50) 100%
+  );
+  font-family:
+    "Pixelify Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  image-rendering: pixelated;
 }
 
 @layer utilities {
@@ -132,62 +162,141 @@ body {
     text-wrap: balance;
   }
 
-  .defi-border {
-    border: 2px solid var(--app-card-border);
+  /* Brand border styles */
+  .brand-border {
+    border: 2px solid var(--brand-primary);
   }
 
-  .defi-shadow {
+  .brand-border-secondary {
+    border: 2px solid var(--brand-secondary);
+  }
+
+  /* Brand shadow styles */
+  .brand-shadow {
     box-shadow:
-      0 4px 20px rgba(0, 191, 255, 0.15),
-      0 2px 8px rgba(0, 191, 255, 0.1);
+      0 4px 20px rgba(201, 226, 101, 0.15),
+      0 2px 8px rgba(201, 226, 101, 0.1);
   }
 
-  .defi-glow {
+  .brand-shadow-lg {
     box-shadow:
-      0 0 20px rgba(0, 191, 255, 0.3),
-      0 0 40px rgba(0, 191, 255, 0.2);
+      0 8px 30px rgba(201, 226, 101, 0.2),
+      0 4px 16px rgba(201, 226, 101, 0.15);
   }
 
-  .defi-card {
+  .brand-glow {
+    box-shadow:
+      0 0 20px rgba(201, 226, 101, 0.3),
+      0 0 40px rgba(201, 226, 101, 0.2);
+  }
+
+  /* Brand card styles */
+  .brand-card {
     background: var(--app-card-bg);
-    border: 2px solid var(--app-card-border);
+    border: 2px solid var(--brand-primary);
     border-radius: var(--app-card-radius);
     box-shadow:
-      0 4px 20px rgba(0, 191, 255, 0.15),
-      0 2px 8px rgba(0, 191, 255, 0.1);
+      0 4px 20px rgba(201, 226, 101, 0.15),
+      0 2px 8px rgba(201, 226, 101, 0.1);
     position: relative;
     overflow: hidden;
   }
 
-  .defi-button {
-    background: var(--app-accent);
-    border: 2px solid var(--app-accent);
+  .brand-card-secondary {
+    background: var(--app-card-bg);
+    border: 2px solid var(--brand-secondary);
+    border-radius: var(--app-card-radius);
+    box-shadow:
+      0 4px 20px rgba(137, 217, 87, 0.15),
+      0 2px 8px rgba(137, 217, 87, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Brand button styles */
+  .brand-button {
+    background: var(--brand-primary);
+    border: 2px solid var(--brand-primary);
     border-radius: var(--app-button-radius);
-    color: white;
+    color: var(--neutral-900);
     font-weight: 600;
     transition: all 0.2s ease;
   }
 
-  .defi-button:hover {
-    background: var(--app-accent-hover);
-    border-color: var(--app-accent-hover);
+  .brand-button:hover {
+    background: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(201, 226, 101, 0.3);
+  }
+
+  .brand-button-secondary {
+    background: var(--brand-secondary);
+    border: 2px solid var(--brand-secondary);
+    border-radius: var(--app-button-radius);
+    color: var(--neutral-900);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .brand-button-secondary:hover {
+    background: var(--brand-secondary-dark);
+    border-color: var(--brand-secondary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(137, 217, 87, 0.3);
+  }
+
+  /* Brand gradient backgrounds */
+  .brand-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary) 0%,
+      var(--brand-secondary) 100%
+    );
+  }
+
+  .brand-gradient-light {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary-light) 0%,
+      var(--brand-secondary-light) 100%
+    );
+  }
+
+  .brand-gradient-dark {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary-dark) 0%,
+      var(--brand-secondary-dark) 100%
+    );
+  }
+
+  /* Brand animations */
+  .animate-brand-pulse {
+    animation: brandPulse 2s ease-in-out infinite;
+  }
+
+  .animate-brand-bounce {
+    animation: brandBounce 0.6s ease-out;
+  }
+
+  .animate-brand-glow {
+    animation: brandGlow 2s ease-in-out infinite;
+  }
+
+  .animate-brand-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(201, 226, 101, 0.4),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: brandShimmer 2s infinite;
   }
 
   .animate-floating-pulse {
     animation: floatingPulse 3s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(0, 191, 255, 0.4),
-      transparent
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
   }
 
   .delay-300 {
@@ -199,6 +308,7 @@ body {
   }
 }
 
+/* Base animations */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -207,18 +317,11 @@ body {
   animation: fadeOut 3s forwards;
 }
 
-.animate-defi-glow {
-  animation: defiGlow 2s ease-in-out infinite;
-}
-
-.animate-defi-bounce {
-  animation: defiBounce 0.6s ease-out;
-}
-
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
 }
 
+/* Keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -242,21 +345,19 @@ body {
   }
 }
 
-@keyframes defiGlow {
+@keyframes brandPulse {
   0%,
   100% {
-    box-shadow:
-      0 4px 20px rgba(0, 191, 255, 0.15),
-      0 2px 8px rgba(0, 191, 255, 0.1);
+    transform: scale(1);
+    opacity: 1;
   }
   50% {
-    box-shadow:
-      0 6px 30px rgba(0, 191, 255, 0.25),
-      0 4px 16px rgba(0, 191, 255, 0.2);
+    transform: scale(1.05);
+    opacity: 0.8;
   }
 }
 
-@keyframes defiBounce {
+@keyframes brandBounce {
   0% {
     transform: scale(0.95);
     opacity: 0;
@@ -267,6 +368,29 @@ body {
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes brandGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(201, 226, 101, 0.15),
+      0 2px 8px rgba(201, 226, 101, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 6px 30px rgba(201, 226, 101, 0.25),
+      0 4px 16px rgba(201, 226, 101, 0.2);
+  }
+}
+
+@keyframes brandShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
   }
 }
 
@@ -292,14 +416,3 @@ body {
     opacity: 0.8;
   }
 }
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-/* Clean wallet styling - no dropdown needed */

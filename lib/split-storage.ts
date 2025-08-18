@@ -97,13 +97,13 @@ export async function updateSplitBill(bill: SplitBill): Promise<void> {
 export async function deleteSplitBill(billId: string): Promise<void> {
   if (!redis) {
     console.error("Redis connection not available");
-    throw new Error("Redis 连接不可用");
+    throw new Error("Redis connection unavailable");
   }
 
   try {
     const bill = await getSplitBill(billId);
     if (bill) {
-      // 从创建者的分账列表中移除
+      // Remove from creator's bill list
       await removeBillFromUserList(bill.creatorAddress, billId);
     }
 
@@ -113,12 +113,12 @@ export async function deleteSplitBill(billId: string): Promise<void> {
     console.log(`Deleted split bill: ${billId}`);
   } catch (error) {
     console.error("Error deleting split bill:", error);
-    throw new Error("删除分账数据失败");
+    throw new Error("Failed to delete split bill data");
   }
 }
 
 /**
- * 添加分账到用户列表
+ * Add split to user's list
  */
 async function addBillToUserList(
   userAddress: string,
@@ -132,14 +132,14 @@ async function addBillToUserList(
   try {
     const key = `${USER_BILLS_PREFIX}${userAddress.toLowerCase()}`;
     await redis.sadd(key, billId);
-    await redis.expire(key, 30 * 24 * 60 * 60); // 30天过期
+    await redis.expire(key, 30 * 24 * 60 * 60); // expire in 30 days
   } catch (error) {
     console.error("Error adding bill to user list:", error);
   }
 }
 
 /**
- * 从用户列表移除分账
+ * Remove split from user list
  */
 async function removeBillFromUserList(
   userAddress: string,
@@ -159,7 +159,7 @@ async function removeBillFromUserList(
 }
 
 /**
- * 获取用户创建的分账列表
+ * Get list of splits created by a user
  */
 export async function getUserSplitBills(
   userAddress: string,
@@ -181,7 +181,7 @@ export async function getUserSplitBills(
       }
     }
 
-    // 按创建时间降序排序
+    // Sort by creation time (desc)
     return bills.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   } catch (error) {
     console.error("Error getting user split bills:", error);
@@ -190,29 +190,29 @@ export async function getUserSplitBills(
 }
 
 /**
- * 保存支付交易记录
+ * Save payment transaction
  */
 export async function savePaymentTransaction(
   transaction: PaymentTransaction,
 ): Promise<void> {
   if (!redis) {
     console.error("Redis connection not available");
-    throw new Error("Redis 连接不可用");
+    throw new Error("Redis connection unavailable");
   }
 
   try {
     const key = `${TRANSACTION_PREFIX}${transaction.id}`;
-    await redis.setex(key, 30 * 24 * 60 * 60, JSON.stringify(transaction)); // 30天过期
+    await redis.setex(key, 30 * 24 * 60 * 60, JSON.stringify(transaction)); // expire in 30 days
 
     console.log(`Saved payment transaction: ${transaction.id}`);
   } catch (error) {
     console.error("Error saving payment transaction:", error);
-    throw new Error("保存交易记录失败");
+    throw new Error("Failed to save transaction record");
   }
 }
 
 /**
- * 获取支付交易记录
+ * Get payment transaction
  */
 export async function getPaymentTransaction(
   transactionId: string,
@@ -261,7 +261,7 @@ export async function getPaymentTransaction(
 }
 
 /**
- * 更新支付交易状态
+ * Update payment transaction status
  */
 export async function updatePaymentTransactionStatus(
   transactionId: string,
@@ -271,7 +271,7 @@ export async function updatePaymentTransactionStatus(
   try {
     const transaction = await getPaymentTransaction(transactionId);
     if (!transaction) {
-      throw new Error("交易记录不存在");
+      throw new Error("Transaction record does not exist");
     }
 
     transaction.status = status;
@@ -282,12 +282,12 @@ export async function updatePaymentTransactionStatus(
     await savePaymentTransaction(transaction);
   } catch (error) {
     console.error("Error updating payment transaction status:", error);
-    throw new Error("更新交易状态失败");
+    throw new Error("Failed to update transaction status");
   }
 }
 
 /**
- * 获取分账的所有交易记录
+ * Get all transactions for a split bill
  */
 export async function getBillTransactions(
   billId: string,
@@ -298,8 +298,8 @@ export async function getBillTransactions(
   }
 
   try {
-    // 这是一个简化实现，实际项目中可能需要更复杂的索引
-    // 目前通过扫描所有交易记录来查找相关交易
+    // This is a simplified implementation; real projects may need better indexing
+    // Currently scan all transactions to find related ones
     const pattern = `${TRANSACTION_PREFIX}*`;
     const keys = await redis.keys(pattern);
 
@@ -336,11 +336,11 @@ export async function getBillTransactions(
 }
 
 /**
- * 清理过期数据 (可以通过定时任务调用)
+ * Cleanup expired data (can be called by a scheduled task)
  */
 export async function cleanupExpiredData(): Promise<void> {
   try {
-    // Redis 会自动处理带有过期时间的键，这里主要是记录日志
+    // Redis automatically handles keys with TTL; this is mainly for logging
     console.log("Cleanup expired data task executed");
   } catch (error) {
     console.error("Error during cleanup:", error);
@@ -348,7 +348,7 @@ export async function cleanupExpiredData(): Promise<void> {
 }
 
 /**
- * 获取统计信息
+ * Get statistics
  */
 export async function getStats(): Promise<{
   totalBills: number;
