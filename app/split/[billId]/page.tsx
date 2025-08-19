@@ -25,12 +25,12 @@ export default function SplitBillPage() {
 
   const handleSuccess = (text: string) => {
     setMessage({ type: "success", text });
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 500);
   };
 
   const handleError = (text: string) => {
     setMessage({ type: "error", text });
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 500);
   };
 
   const handleGoHome = () => {

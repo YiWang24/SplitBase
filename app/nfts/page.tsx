@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Star, Sparkles, Search, Filter } from "lucide-react";
 import { NFTData } from "@/lib/nft-types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,12 +21,7 @@ export default function NFTGalleryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRarity, setFilterRarity] = useState<string>("all");
 
-  // Fetch NFTs when component mounts or user connection changes
-  useEffect(() => {
-    fetchNFTs();
-  }, [isConnected, address]);
-
-  const fetchNFTs = async () => {
+  const fetchNFTs = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -52,7 +47,12 @@ export default function NFTGalleryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isConnected, address]);
+
+  // Fetch NFTs when component mounts or user connection changes
+  useEffect(() => {
+    fetchNFTs();
+  }, [fetchNFTs]);
 
   const handleNFTClick = (nft: NFTData) => {
     setSelectedNFT(nft);

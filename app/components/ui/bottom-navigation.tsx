@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Home, Receipt, Plus, Users, Star } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, Receipt, Plus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export default function BottomNavigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleCreateClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,12 +35,6 @@ export default function BottomNavigation() {
       onClick: handleCreateClick,
     },
     {
-      href: "/nfts",
-      icon: Star,
-      label: "NFTs",
-      onClick: undefined,
-    },
-    {
       href: "/friends",
       icon: Users,
       label: "Friends",
@@ -58,13 +51,11 @@ export default function BottomNavigation() {
             // Improved active state detection
             let isActive = false;
             if (item.label === "Home") {
-              isActive = pathname === "/" && !searchParams.get("action");
+              isActive = pathname === "/";
             } else if (item.label === "Bills") {
               isActive = pathname === "/bills";
             } else if (item.label === "Create") {
               isActive = pathname === "/create";
-            } else if (item.label === "NFTs") {
-              isActive = pathname === "/nfts";
             } else if (item.label === "Friends") {
               isActive = pathname === "/friends";
             }

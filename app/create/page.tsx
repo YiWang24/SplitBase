@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Sparkles, Wallet, Users, DollarSign } from "lucide-react";
 import CreateSplitForm from "../components/ui/create-split-form";
 
 export default function CreatePage() {
-  const router = useRouter();
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -15,20 +13,20 @@ export default function CreatePage() {
   // Handle message display
   const handleSuccess = (text: string) => {
     setMessage({ type: "success", text });
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleError = (text: string) => {
     setMessage({ type: "error", text });
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 3000);
   };
 
   // Handle split creation success
-  const handleSplitCreated = (billId: string) => {
-    handleSuccess("Split created successfully!");
-    setTimeout(() => {
-      router.push(`/split/${billId}`);
-    }, 1000);
+  const handleSplitCreated = () => {
+    handleSuccess(
+      "Split created successfully! Share the QR code with friends.",
+    );
+    // No need to redirect since share modal will be shown
   };
 
   return (
@@ -48,7 +46,7 @@ export default function CreatePage() {
         {/* Enhanced Subtitle */}
         <div className="space-y-3">
           <p className="text-lg text-neutral-700 font-medium">
-            Split bills with friends using USDC on Base
+            Create and share split bills with friends using USDC on Base
           </p>
 
           {/* Feature Highlights */}
@@ -62,7 +60,7 @@ export default function CreatePage() {
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#89d957]/20 to-[#6bbf3a]/20 rounded-full border border-[#89d957]/30">
               <Users className="h-4 w-4 text-[#89d957]" />
               <span className="text-xs font-semibold text-neutral-700">
-                Group Splitting
+                Simple Sharing
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#6bbf3a]/20 to-[#b8d14a]/20 rounded-full border border-[#6bbf3a]/30">

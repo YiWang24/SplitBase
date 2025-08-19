@@ -18,7 +18,8 @@ export interface SplitBill {
   participants: Participant[];
   shareUrl?: string;
   qrCodeUrl?: string;
-  nftReceiptId?: string; // NFT receipt ID
+  nftReceiptId?: string; // Legacy NFT receipt ID (for backward compatibility)
+  nftReceipts?: NFTReceipt[]; // NFT receipts for all participants
 }
 
 export interface Participant {
@@ -30,6 +31,7 @@ export interface Participant {
   status: "pending" | "paid" | "confirmed";
   paidAt?: Date;
   transactionHash?: string;
+  nftReceiptId?: string; // NFT receipt ID for this participant
 }
 
 // Friend type for managing contacts
@@ -75,10 +77,8 @@ export interface CreateSplitBillInput {
   title: string;
   description?: string;
   totalAmount: string;
-  participantCount: number;
   creatorAddress: string;
   creatorBasename?: string;
-  selectedFriends?: Friend[]; // Selected friends list
 }
 
 // Input type for joining split bill
@@ -98,6 +98,15 @@ export interface PaymentStatusUpdate {
 }
 
 // API response type
+// NFT receipt for a specific participant
+export interface NFTReceipt {
+  id: string;
+  participantAddress: string;
+  participantBasename?: string;
+  nftId: string;
+  createdAt: Date;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

@@ -41,6 +41,8 @@ export default function ReceiptDetailPage() {
     }
   };
 
+  const { address } = useAccount();
+
   const handleNFTCreated = (nftId: string) => {
     console.log("=== handleNFTCreated called ===");
     console.log("NFT created successfully:", nftId);
@@ -49,28 +51,25 @@ export default function ReceiptDetailPage() {
 
     setShowNFTModal(false);
 
-    // Refresh bill data to get updated NFT information
-    const refreshBill = async () => {
-      try {
-        const response = await fetch(`/api/split/${billId}`);
-        const result = await response.json();
-        if (result?.success && result?.data) {
-          setBill(result.data as SplitBill);
-          console.log("Bill data refreshed successfully");
-        }
-      } catch (error) {
-        console.error("Error refreshing bill:", error);
-      }
-    };
-
-    refreshBill();
+    // Update local bill state to include NFT information in the participant
+    if (bill && address) {
+      setBill({
+        ...bill,
+        participants: bill.participants.map((participant) =>
+          participant.address?.toLowerCase() === address?.toLowerCase()
+            ? { ...participant, nftReceiptId: nftId }
+            : participant,
+        ),
+        updatedAt: new Date(),
+      });
+    }
 
     // Add a delay to show the success message
     console.log("Scheduling navigation in 1 second...");
     setTimeout(() => {
       console.log("Executing navigation to:", `/nfts/${nftId}`);
       router.push(`/nfts/${nftId}`);
-    }, 500); 
+    }, 500);
   };
 
   return (

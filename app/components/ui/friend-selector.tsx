@@ -33,13 +33,6 @@ export default function FriendSelector({
   const [newAddress, setNewAddress] = useState("");
   const [newNickname, setNewNickname] = useState("");
 
-  // Load friends from localStorage
-  useEffect(() => {
-    if (isConnected && address) {
-      loadFriends();
-    }
-  }, [isConnected, address]);
-
   const loadFriends = useCallback(async () => {
     if (address) {
       try {
@@ -51,6 +44,13 @@ export default function FriendSelector({
       }
     }
   }, [address]);
+
+  // Load friends from localStorage
+  useEffect(() => {
+    if (isConnected && address) {
+      loadFriends();
+    }
+  }, [isConnected, address, loadFriends]);
 
   const saveFriends = useCallback(
     async (newFriends: Friend[]) => {

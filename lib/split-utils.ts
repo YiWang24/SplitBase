@@ -68,36 +68,9 @@ export function validateSplitBillInput(input: CreateSplitBillInput): {
     );
   }
 
-  // Calculate actual participant count
-  let actualParticipantCount = input.participantCount;
-  if (input.selectedFriends && input.selectedFriends.length > 0) {
-    actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
-  }
-
-  // Validate participant count
-  if (actualParticipantCount < 2) {
-    errors.push("At least 2 participants required");
-  }
-
-  if (actualParticipantCount > BASE_PAY_CONFIG.MAX_PARTICIPANTS) {
-    errors.push(
-      `Cannot exceed ${BASE_PAY_CONFIG.MAX_PARTICIPANTS} participants`,
-    );
-  }
-
   // Validate creator address
   if (!input.creatorAddress || !isValidEthereumAddress(input.creatorAddress)) {
     errors.push("Invalid creator address");
-  }
-
-  // Validate if amount per person is reasonable
-  const amountPerPerson = parseFloat(
-    calculateAmountPerPerson(input.totalAmount, actualParticipantCount),
-  );
-  if (amountPerPerson < parseFloat(BASE_PAY_CONFIG.MIN_AMOUNT)) {
-    errors.push(
-      `Amount per person ${amountPerPerson.toFixed(6)} USDC is below minimum limit ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`,
-    );
   }
 
   return {
@@ -124,16 +97,9 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
 
   const billId = generateBillId();
 
-  // Calculate actual participant count and per-person amount
-  let actualParticipantCount = input.participantCount;
-  if (input.selectedFriends && input.selectedFriends.length > 0) {
-    actualParticipantCount = input.selectedFriends.length + 1; // +1 for creator
-  }
-
-  const amountPerPerson = calculateAmountPerPerson(
-    input.totalAmount,
-    actualParticipantCount,
-  );
+  // Initially only creator, so amount per person equals total amount
+  const initialParticipantCount = 1;
+  const amountPerPerson = input.totalAmount;
 
   const bill: SplitBill = {
     id: billId,
@@ -141,7 +107,7 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
     description: input.description?.trim(),
     totalAmount: input.totalAmount,
     currency: "USDC",
-    participantCount: actualParticipantCount, // Use actual participant count
+    participantCount: initialParticipantCount, // Start with 1 (creator only)
     amountPerPerson,
     creatorAddress: input.creatorAddress,
     creatorBasename: input.creatorBasename,
@@ -153,28 +119,12 @@ export function createSplitBill(input: CreateSplitBillInput): SplitBill {
   };
 
   // Add creator as a participant (status paid, since creator does not pay)
-  let updatedBill = addCreatorAsParticipant(
+  const updatedBill = addCreatorAsParticipant(
     bill,
     input.creatorAddress,
     input.creatorBasename,
     input.creatorBasename || "Creator",
   );
-
-  // If there are selected friends, add them as participants automatically
-  if (input.selectedFriends && input.selectedFriends.length > 0) {
-    for (const friend of input.selectedFriends) {
-      try {
-        updatedBill = addParticipant(
-          updatedBill,
-          friend.address,
-          friend.basename,
-          friend.nickname,
-        );
-      } catch (error) {
-        console.warn(`Failed to add friend ${friend.address}:`, error);
-      }
-    }
-  }
 
   return updatedBill;
 }
@@ -188,7 +138,7 @@ export function generateShareUrl(billId: string): string {
 }
 
 /**
- * Add creator as a participant (status: paid)
+ * Add creator as a participant (status paid)
  */
 export function addCreatorAsParticipant(
   bill: SplitBill,
@@ -217,7 +167,7 @@ export function addCreatorAsParticipant(
       displayName ||
       basename ||
       `${address.slice(0, 6)}...${address.slice(-4)}`,
-    amount: bill.amountPerPerson,
+    amount: bill.amountPerPerson, // Use the current amount per person
     status: "paid", // Creator is marked as paid
   };
 
@@ -247,15 +197,17 @@ export function addParticipant(
     throw new Error("This address has already joined this split");
   }
 
-  // Check if full
-  if (bill.participants.length >= bill.participantCount) {
-    throw new Error("Split is full; cannot add more participants");
-  }
-
   // Validate address
   if (!isValidEthereumAddress(address)) {
     throw new Error("Invalid Ethereum address");
   }
+
+  // Calculate new participant count and amount per person
+  const newParticipantCount = bill.participants.length + 1;
+  const newAmountPerPerson = calculateAmountPerPerson(
+    bill.totalAmount,
+    newParticipantCount,
+  );
 
   const participant: Participant = {
     id: generateParticipantId(),
@@ -265,13 +217,21 @@ export function addParticipant(
       displayName ||
       basename ||
       `${address.slice(0, 6)}...${address.slice(-4)}`,
-    amount: bill.amountPerPerson,
+    amount: newAmountPerPerson,
     status: "pending",
   };
 
+  // Update all existing participants' amounts to the new per-person amount
+  const updatedParticipants = bill.participants.map((p) => ({
+    ...p,
+    amount: newAmountPerPerson,
+  }));
+
   const updatedBill: SplitBill = {
     ...bill,
-    participants: [...bill.participants, participant],
+    participantCount: newParticipantCount,
+    amountPerPerson: newAmountPerPerson,
+    participants: [...updatedParticipants, participant],
     updatedAt: new Date(),
   };
 
@@ -308,14 +268,11 @@ export function updateParticipantPayment(
     updatedAt: new Date(),
   };
 
-  // Check if everyone has paid
+  // Check if everyone has paid (all participants including creator)
   const allPaid = updatedBill.participants.every(
     (p) => p.status === "paid" || p.status === "confirmed",
   );
-  if (
-    allPaid &&
-    updatedBill.participants.length === updatedBill.participantCount
-  ) {
+  if (allPaid && updatedBill.participants.length >= 1) {
     updatedBill.status = "completed";
   }
 
@@ -342,9 +299,11 @@ export function calculateBillStats(bill: SplitBill): SplitBillStats {
     0,
   );
 
+  // Use actual participant count for completion rate
+  const actualParticipantCount = bill.participants.length;
   const completionRate =
-    bill.participantCount > 0
-      ? (paidParticipants.length / bill.participantCount) * 100
+    actualParticipantCount > 0
+      ? (paidParticipants.length / actualParticipantCount) * 100
       : 0;
 
   return {
@@ -422,10 +381,6 @@ export function canJoinBill(
 } {
   if (bill.status !== "active") {
     return { canJoin: false, reason: "Split is closed" };
-  }
-
-  if (bill.participants.length >= bill.participantCount) {
-    return { canJoin: false, reason: "Split is full" };
   }
 
   const isCreator =

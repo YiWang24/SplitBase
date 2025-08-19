@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import QRCode from "qrcode";
 import {
   Copy,
@@ -49,14 +49,7 @@ export default function ShareModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // Generate QR code
-  useEffect(() => {
-    if (isOpen && shareUrl) {
-      generateQRCode();
-    }
-  }, [isOpen, shareUrl]);
-
-  const generateQRCode = async () => {
+  const generateQRCode = useCallback(async () => {
     setIsGenerating(true);
     try {
       const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
@@ -73,7 +66,14 @@ export default function ShareModal({
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [shareUrl]);
+
+  // Generate QR code
+  useEffect(() => {
+    if (isOpen && shareUrl) {
+      generateQRCode();
+    }
+  }, [isOpen, shareUrl, generateQRCode]);
 
   // Copy link
   const handleCopyLink = async () => {

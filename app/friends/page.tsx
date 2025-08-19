@@ -269,23 +269,6 @@ export default function FriendsPage() {
   } | null>(null);
   const [deletingFriendId, setDeletingFriendId] = useState<string | null>(null);
 
-  // Load friends from localStorage on mount
-  useEffect(() => {
-    if (isConnected && address) {
-      loadFriends();
-    }
-  }, [isConnected, address]);
-
-  // Auto-hide toast after 3 seconds
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => {
-        setToast(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
-
   const loadFriends = useCallback(async () => {
     if (address) {
       try {
@@ -297,6 +280,23 @@ export default function FriendsPage() {
       }
     }
   }, [address]);
+
+  // Load friends from localStorage on mount
+  useEffect(() => {
+    if (isConnected && address) {
+      loadFriends();
+    }
+  }, [isConnected, address, loadFriends]);
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const handleModalSubmit = (
     data: AddFriendInput & { isFavorite?: boolean },

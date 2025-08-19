@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
 import { SplitBill, Participant } from "@/lib/types";
 import {
@@ -12,7 +12,6 @@ import {
 import {
   Plus,
   Share,
-  User,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -30,10 +29,126 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-import { Avatar as OnchainAvatar } from "@coinbase/onchainkit/identity";
+import {
+  Avatar as OnchainAvatar,
+  useName,
+} from "@coinbase/onchainkit/identity";
+import { base } from "viem/chains";
 import PaymentButton from "./payment-button";
 import ShareModal from "./share-modal";
 import { useRouter } from "next/navigation";
+
+// Participant Item Component with dynamic basename
+function ParticipantItem({
+  participant,
+  bill,
+  currentAddress,
+  onPaymentSuccess,
+  onPaymentError,
+}: {
+  participant: Participant;
+  bill: SplitBill;
+  currentAddress?: string;
+  onPaymentSuccess: (participantId: string, txHash: string) => void;
+  onPaymentError: (participantId: string, txHash: string) => void;
+}) {
+  const { data: basename } = useName({
+    address: participant.address as `0x${string}`,
+    chain: base,
+  });
+
+  const displayName =
+    basename || participant.displayName || formatAddress(participant.address);
+
+  return (
+    <div className="space-y-3 p-3 rounded-lg bg-gradient-to-r from-white/80 to-neutral-50/80 border border-neutral-200/50 hover:border-[var(--brand-primary)]/30 transition-all duration-300">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <OnchainAvatar
+              address={participant.address as `0x${string}`}
+              className="w-10 h-10 border-2 border-white shadow-md"
+            />
+            {/* Show Creator badge for creator */}
+            {participant.address.toLowerCase() ===
+              bill.creatorAddress.toLowerCase() && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--brand-primary)] rounded-full flex items-center justify-center border-2 border-white">
+                <span className="text-[8px] font-bold text-white">C</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="font-medium text-neutral-900">
+                {displayName}
+              </span>
+              {/* Show You badge for current user */}
+              {participant.address.toLowerCase() ===
+                currentAddress?.toLowerCase() && (
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] px-2 py-0.5 bg-[var(--brand-secondary)]/20 border-[var(--brand-secondary)] text-[var(--brand-secondary)]"
+                >
+                  YOU
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs text-neutral-500 font-mono">
+              {formatAddress(participant.address)}
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          {/* Show amount for all participants */}
+          <p className="text-sm font-bold text-neutral-900 mb-1">
+            {formatAmount(participant.amount, 2)} USDC
+          </p>
+
+          {/* Show different status for creator vs other participants */}
+          {participant.address.toLowerCase() ===
+          bill.creatorAddress.toLowerCase() ? (
+            // Creator shows as Recipient
+            <div className="flex items-center justify-end gap-1">
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-200">
+                RECIPIENT
+              </span>
+            </div>
+          ) : (
+            // Other participants show payment status
+            <div className="flex items-center justify-end gap-1">
+              {participant.status === "paid" ||
+              participant.status === "confirmed" ? (
+                <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-200 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  PAID
+                </span>
+              ) : (
+                <span className="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-200 flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  PENDING
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Button */}
+      {participant.address.toLowerCase() === currentAddress?.toLowerCase() &&
+        participant.status === "pending" &&
+        bill.status === "active" && (
+          <div className="pt-2 border-t border-neutral-200/50">
+            <PaymentButton
+              recipientAddress={bill.creatorAddress}
+              amount={participant.amount}
+              onSuccess={(txHash) => onPaymentSuccess(participant.id, txHash)}
+              onError={(txHash) => onPaymentError(participant.id, txHash)}
+            />
+          </div>
+        )}
+    </div>
+  );
+}
 
 interface SplitBillDetailProps {
   billId: string;
@@ -47,6 +162,10 @@ export default function SplitBillDetail({
   onSuccess,
 }: SplitBillDetailProps) {
   const { address } = useAccount();
+  const { data: userBasename } = useName({
+    address: address!,
+    chain: base,
+  });
   const [bill, setBill] = useState<SplitBill | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
@@ -55,7 +174,7 @@ export default function SplitBillDetail({
   const router = useRouter();
 
   // Fetch bill details
-  const fetchBillDetail = async () => {
+  const fetchBillDetail = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/split/${billId}`);
@@ -73,11 +192,11 @@ export default function SplitBillDetail({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [billId, onError]);
 
   useEffect(() => {
     fetchBillDetail();
-  }, [billId, refreshKey]);
+  }, [billId, refreshKey, fetchBillDetail]);
 
   // Join split bill
   const handleJoinBill = async () => {
@@ -101,8 +220,8 @@ export default function SplitBillDetail({
           action: "join",
           billId,
           participantAddress: address,
-          participantBasename: undefined,
-          displayName: undefined,
+          participantBasename: userBasename ? String(userBasename) : undefined,
+          displayName: userBasename ? String(userBasename) : undefined,
         }),
       });
 
@@ -145,6 +264,36 @@ export default function SplitBillDetail({
 
       if (result.success) {
         onSuccess("Payment successful!");
+        setRefreshKey((prev) => prev + 1); // Trigger reload
+      } else {
+        onError(result.error || "Payment status update failed");
+      }
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      onError("Payment status update failed");
+    }
+  };
+
+  // Handle payment error
+  const handlePaymentError = async (participantId: string, txHash: string) => {
+    try {
+      const response = await fetch(`/api/split/${billId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "payment",
+          participantId,
+          transactionHash: txHash,
+          status: "failed",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        onError("Payment failed - please try again");
         setRefreshKey((prev) => prev + 1); // Trigger reload
       } else {
         onError(result.error || "Payment status update failed");
@@ -273,7 +422,7 @@ export default function SplitBillDetail({
             <div className="flex justify-between text-xs text-neutral-600">
               <span className="flex items-center gap-1">
                 <CheckCircle className="w-3 h-3 text-green-600" />
-                {stats.paidParticipants}/{bill.participantCount} people paid
+                {stats.paidParticipants}/{bill.participants.length} people paid
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 bg-[var(--brand-primary)] rounded-full"></span>
@@ -288,7 +437,7 @@ export default function SplitBillDetail({
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="w-full border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 hover:border-[var(--brand-primary)]/70 transition-all duration-300"
+              className="w-full bg-gradient-to-r from-[var(--brand-primary)]/90 to-[var(--brand-primary)]/80 text-neutral-900 border-2 border-[var(--brand-primary)] hover:from-[var(--brand-primary)] hover:to-[var(--brand-primary)]/90 hover:border-[var(--brand-primary)]/80 shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
             >
               <Share className="mr-2 h-4 w-4" />
               Share Split
@@ -300,7 +449,7 @@ export default function SplitBillDetail({
                 variant="outline"
                 size="sm"
                 onClick={() => router.push(`/receipts/${bill.id}`)}
-                className="w-full border-[var(--brand-secondary)] text-[var(--brand-secondary)] hover:bg-[var(--brand-secondary)]/10 hover:border-[var(--brand-secondary)]/70 transition-all duration-300"
+                className="w-full bg-gradient-to-r from-[var(--brand-secondary)]/90 to-[var(--brand-secondary)]/80 text-neutral-900 border-2 border-[var(--brand-secondary)] hover:from-[var(--brand-secondary)] hover:to-[var(--brand-secondary)]/90 hover:border-[var(--brand-secondary)]/80 shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
               >
                 <Receipt className="mr-2 h-4 w-4" />
                 View Receipt
@@ -315,134 +464,42 @@ export default function SplitBillDetail({
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-bold tracking-wide text-neutral-900 flex items-center gap-2">
             <Users className="w-5 h-5 text-[var(--brand-secondary)]" />
-            PARTICIPANTS ({bill.participants.length}/{bill.participantCount})
+            PARTICIPANTS ({bill.participants.length})
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {/* Participants */}
           <div className="space-y-4">
-            {bill.participants.map(
-              (participant: Participant, index: number) => (
-                <div
-                  key={participant.id}
-                  className="space-y-3 p-3 rounded-lg bg-gradient-to-r from-white/80 to-neutral-50/80 border border-neutral-200/50 hover:border-[var(--brand-primary)]/30 transition-all duration-300"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="relative">
-                        <OnchainAvatar
-                          address={participant.address as `0x${string}`}
-                          className="w-10 h-10 border-2 border-white shadow-md"
-                        />
-                        {/* Show Creator badge for creator */}
-                        {participant.address.toLowerCase() ===
-                          bill.creatorAddress.toLowerCase() && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--brand-primary)] rounded-full flex items-center justify-center border-2 border-white">
-                            <span className="text-[8px] font-bold text-white">
-                              C
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="font-medium text-neutral-900">
-                            {participant.displayName}
-                          </span>
-                          {/* Show You badge for current user */}
-                          {participant.address.toLowerCase() ===
-                            address?.toLowerCase() && (
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] px-2 py-0.5 bg-[var(--brand-secondary)]/20 border-[var(--brand-secondary)] text-[var(--brand-secondary)]"
-                            >
-                              YOU
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-neutral-500 font-mono">
-                          {formatAddress(participant.address)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {/* Show amount for all participants */}
-                      <p className="text-sm font-bold text-neutral-900 mb-1">
-                        {formatAmount(participant.amount, 2)} USDC
-                      </p>
+            {bill.participants.map((participant: Participant) => (
+              <ParticipantItem
+                key={participant.id}
+                participant={participant}
+                bill={bill}
+                currentAddress={address}
+                onPaymentSuccess={handlePaymentSuccess}
+                onPaymentError={handlePaymentError}
+              />
+            ))}
 
-                      {/* Show different status for creator vs other participants */}
-                      {participant.address.toLowerCase() ===
-                      bill.creatorAddress.toLowerCase() ? (
-                        // Creator shows as Recipient
-                        <div className="flex items-center justify-end gap-1">
-                          <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-200">
-                            RECIPIENT
-                          </span>
-                        </div>
-                      ) : (
-                        // Other participants show payment status
-                        <div className="flex items-center justify-end gap-1">
-                          {participant.status === "paid" ||
-                          participant.status === "confirmed" ? (
-                            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-200 flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3" />
-                              PAID
-                            </span>
-                          ) : (
-                            <span className="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-200 flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              PENDING
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+            {/* Add a message encouraging more people to join */}
+            {bill.participants.length === 1 && (
+              <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-blue-600" />
                   </div>
-
-                  {/* Payment Button */}
-                  {participant.address.toLowerCase() ===
-                    address?.toLowerCase() &&
-                    participant.status === "pending" &&
-                    bill.status === "active" && (
-                      <div className="pt-2 border-t border-neutral-200/50">
-                        <PaymentButton
-                          recipientAddress={bill.creatorAddress}
-                          amount={participant.amount}
-                          onSuccess={(txHash) =>
-                            handlePaymentSuccess(participant.id, txHash)
-                          }
-                          onError={(txHash) =>
-                            handlePaymentSuccess(participant.id, txHash)
-                          }
-                        />
-                      </div>
-                    )}
+                  <div>
+                    <p className="text-blue-800 font-medium">
+                      Share this split to invite friends!
+                    </p>
+                    <p className="text-blue-600 text-sm">
+                      The amount will be split equally among all participants
+                    </p>
+                  </div>
                 </div>
-              ),
+              </div>
             )}
-
-            {/* Empty Slots - Only show if there are still available slots */}
-            {bill.participants.length < bill.participantCount &&
-              Array.from({
-                length: bill.participantCount - bill.participants.length,
-              }).map((_, index) => (
-                <div
-                  key={`empty-${index}`}
-                  className="opacity-60 p-3 rounded-lg bg-gradient-to-r from-neutral-100/50 to-neutral-50/50 border border-dashed border-neutral-300/50"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-neutral-200 rounded-full flex items-center justify-center border-2 border-dashed border-neutral-300">
-                      <User className="h-5 w-5 text-neutral-400" />
-                    </div>
-                    <span className="text-neutral-500 font-medium">
-                      Waiting for participant to join
-                    </span>
-                  </div>
-                </div>
-              ))}
           </div>
         </CardContent>
       </Card>
@@ -472,8 +529,8 @@ export default function SplitBillDetail({
         </Card>
       )}
 
-      {/* Wallet Not Connected Message - Only show if there are still available slots */}
-      {!address && bill.participants.length < bill.participantCount && (
+      {/* Wallet Not Connected Message */}
+      {!address && (
         <Card className="text-center p-6 bg-gradient-to-r from-yellow-50 to-yellow-100/50 border-2 border-yellow-200/50">
           <CardContent className="space-y-2">
             <AlertCircle className="mx-auto h-8 w-8 text-yellow-500" />

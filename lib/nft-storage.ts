@@ -291,16 +291,16 @@ export async function getUserNFTCount(userId?: string): Promise<number> {
 export async function getNFTByBillId(
   billId: string,
   userId?: string,
-): Promise<NFTData | null> {
+): Promise<NFTData[]> {
   if (!redis) {
-    return null;
+    return [];
   }
 
   try {
     const userNfts = await getUserNFTs(userId);
-    return userNfts.find((nft) => nft.billId === billId) || null;
+    return userNfts.filter((nft) => nft.billId === billId);
   } catch (error) {
     console.error("Error checking NFT by bill ID:", error);
-    return null;
+    return [];
   }
 }

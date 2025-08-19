@@ -118,7 +118,7 @@ export default function NFTCreationModal({
     if (isOpen) {
       generatePreview();
     }
-  }, [generatePreview]);
+  }, [generatePreview, isOpen]);
 
   const handleCreateNFT = async () => {
     setIsCreating(true);
@@ -174,6 +174,24 @@ export default function NFTCreationModal({
         console.log("NFT creation completed successfully:", result);
         console.log("NFT ID:", result.nftId);
         console.log("Calling onNFTCreated callback...");
+
+        // Update local bill state to include NFT information in the participant
+        if (bill && address) {
+          // Update the participant's nftReceiptId
+          const participantIndex = bill.participants.findIndex(
+            (participant) =>
+              participant.address?.toLowerCase() === address?.toLowerCase(),
+          );
+
+          if (participantIndex !== -1) {
+            bill.participants[participantIndex] = {
+              ...bill.participants[participantIndex],
+              nftReceiptId: result.nftId,
+            };
+          }
+
+          bill.updatedAt = new Date();
+        }
 
         onNFTCreated(result.nftId);
         onClose();

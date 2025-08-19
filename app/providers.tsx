@@ -5,7 +5,7 @@ import { baseSepolia } from "wagmi/chains";
 import { createConfig, WagmiProvider, http } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
-
+import { coinbaseWallet } from 'wagmi/connectors';
 // Create a client
 const queryClient = new QueryClient();
 
@@ -15,6 +15,11 @@ const config = createConfig({
   transports: {
     [baseSepolia.id]: http(),
   },
+  connectors: [
+    coinbaseWallet({
+      appName: 'onchainkit',
+    }),
+  ],
   // Enable connection persistence
   ssr: true,
 });

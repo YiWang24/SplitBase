@@ -49,10 +49,26 @@ export async function POST(request: NextRequest) {
       // Update the bill with NFT information
       try {
         const bill = await getSplitBill(params.billId);
-        if (bill) {
-          bill.nftReceiptId = nftId;
-          bill.updatedAt = new Date();
-          await updateSplitBill(bill);
+        if (bill && userId) {
+          // Find the participant by userId (address) and update their nftReceiptId
+          const participantIndex = bill.participants.findIndex(
+            (participant) =>
+              participant.address.toLowerCase() === userId.toLowerCase(),
+          );
+
+          if (participantIndex !== -1) {
+            // Update the specific participant's nftReceiptId
+            bill.participants[participantIndex] = {
+              ...bill.participants[participantIndex],
+              nftReceiptId: nftId,
+            };
+
+            // Also keep the legacy nftReceiptId for backward compatibility
+            bill.nftReceiptId = nftId;
+            bill.updatedAt = new Date();
+
+            await updateSplitBill(bill);
+          }
         }
       } catch (error) {
         console.error("Error updating bill with NFT ID:", error);

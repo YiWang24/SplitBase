@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import {
   Check,
   Star,
@@ -45,6 +46,7 @@ export default function ReceiptDetail({
   onCreateNFT,
   isWalletConnected = false,
 }: ReceiptDetailProps) {
+  const { address } = useAccount();
   const [bill, setBill] = useState<SplitBill | null>(billProp ?? null);
   const [completedAt, setCompletedAt] = useState<string>("");
   const [isCreatingNFT, setIsCreatingNFT] = useState(false);
@@ -84,22 +86,52 @@ export default function ReceiptDetail({
     fetchBill();
   }, [billId, bill]);
 
-  // Check if NFT already exists for this bill
+  // Check if current user already has NFT for this bill
   useEffect(() => {
     const checkExistingNFT = async () => {
-      if (!bill?.id) return;
+      if (!bill?.id || !address) return;
       try {
-        const existingNFT = await getNFTByBillId(bill.id);
-        if (existingNFT) {
+        // Check if current user already has NFT for this bill by looking at participants array
+        const currentParticipant = bill.participants?.find(
+          (participant) =>
+            participant.address?.toLowerCase() === address?.toLowerCase(),
+        );
+
+        if (currentParticipant?.nftReceiptId) {
           setNftExists(true);
-          setExistingNFTId(existingNFT.id);
+          setExistingNFTId(currentParticipant.nftReceiptId);
+          return;
+        }
+
+        // Fallback: check if user has NFT in storage
+        if (address) {
+          const userNFTs = await getNFTByBillId(bill.id, address);
+          if (userNFTs.length > 0) {
+            setNftExists(true);
+            setExistingNFTId(userNFTs[0].id);
+          }
         }
       } catch (error) {
         console.error("Error checking existing NFT:", error);
       }
     };
     checkExistingNFT();
-  }, [bill]);
+  }, [bill, address]);
+
+  // Check if current user is a participant in this bill
+  const isCurrentUserParticipant =
+    bill?.participants?.some(
+      (participant) =>
+        participant.address?.toLowerCase() === address?.toLowerCase(),
+    ) || false;
+
+  // Debug logging
+  console.log("=== Debug Info ===");
+  console.log("Current address:", address);
+  console.log("Bill participants:", bill?.participants);
+  console.log("isCurrentUserParticipant:", isCurrentUserParticipant);
+  console.log("isWalletConnected:", isWalletConnected);
+  console.log("nftExists:", nftExists);
 
   const handleCreateNFT = async () => {
     if (onCreateNFT) {
@@ -119,13 +151,47 @@ export default function ReceiptDetail({
     setExistingNFTId(nftId);
     setShowNFTModal(false);
 
-    // Update local bill state to include NFT information
-    if (bill) {
+    // Update local bill state to include NFT information in the participant
+    if (bill && address) {
       setBill({
         ...bill,
-        nftReceiptId: nftId,
+        participants: bill.participants.map((participant) =>
+          participant.address?.toLowerCase() === address?.toLowerCase()
+            ? { ...participant, nftReceiptId: nftId }
+            : participant,
+        ),
         updatedAt: new Date(),
       });
+
+      // Force refresh the NFT check
+      setTimeout(() => {
+        const checkExistingNFT = async () => {
+          try {
+            // Check if current user already has NFT for this bill by looking at participants array
+            const currentParticipant = bill.participants?.find(
+              (participant) =>
+                participant.address?.toLowerCase() === address?.toLowerCase(),
+            );
+
+            if (currentParticipant?.nftReceiptId) {
+              setNftExists(true);
+              setExistingNFTId(currentParticipant.nftReceiptId);
+            } else {
+              // Fallback: check if user has NFT in storage
+              if (address) {
+                const userNFTs = await getNFTByBillId(bill.id, address);
+                if (userNFTs.length > 0) {
+                  setNftExists(true);
+                  setExistingNFTId(userNFTs[0].id);
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error checking existing NFT:", error);
+          }
+        };
+        checkExistingNFT();
+      }, 100); // Wait 100ms for the NFT to be properly stored
     }
   };
 
@@ -195,7 +261,7 @@ export default function ReceiptDetail({
               <div className="text-center p-4 bg-brand-secondary/5 rounded-xl border border-brand-secondary/20">
                 <Users className="w-6 h-6 text-brand-secondary mx-auto mb-2" />
                 <p className="text-2xl font-bold text-neutral-700">
-                  {bill.participantCount}
+                  {bill.participants.length}
                 </p>
                 <p className="text-xs text-neutral-500 font-medium">
                   Participants
@@ -229,7 +295,8 @@ export default function ReceiptDetail({
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-neutral-700 flex items-center">
                 <Users className="w-4 h-4 mr-2 text-brand-primary" />
-                Participants ({stats.paidParticipants}/{bill.participantCount})
+                Participants ({stats.paidParticipants}/
+                {bill.participants.length})
               </h3>
               <Badge className="bg-success-light text-success-dark border-success-main/30">
                 All Complete
@@ -265,8 +332,8 @@ export default function ReceiptDetail({
 
           <Separator className="bg-neutral-200" />
 
-          {/* NFT Section - Only show if wallet is connected */}
-          {isWalletConnected && (
+          {/* NFT Section - Only show if wallet is connected and user is a participant */}
+          {isWalletConnected && isCurrentUserParticipant && (
             <div className="space-y-4">
               <div className="flex items-start space-x-4 p-4 bg-gradient-to-br from-brand-primary/10 via-brand-secondary/10 to-brand-accent/10 rounded-xl border border-brand-primary/20">
                 <div className="w-10 h-10 bg-brand-gradient rounded-xl flex items-center justify-center">
@@ -283,12 +350,12 @@ export default function ReceiptDetail({
                     receipt storage
                   </p>
 
-                  {bill.nftReceiptId || nftExists ? (
+                  {nftExists ? (
                     <div className="flex items-center justify-between p-3 bg-success-light rounded-lg border border-success-main/30">
                       <div className="flex items-center space-x-2">
                         <Check className="w-4 h-4 text-success-dark" />
                         <span className="text-sm font-medium text-success-dark">
-                          NFT Receipt Generated
+                          Your NFT Receipt Generated
                         </span>
                       </div>
                       <Button
@@ -296,9 +363,8 @@ export default function ReceiptDetail({
                         variant="outline"
                         className="border-success-main/50 text-success-dark hover:bg-success-main/10"
                         onClick={() => {
-                          const nftId = bill.nftReceiptId || existingNFTId;
-                          if (nftId) {
-                            window.open(`/nfts/${nftId}`, "_blank");
+                          if (existingNFTId) {
+                            window.open(`/nfts/${existingNFTId}`, "_blank");
                           }
                         }}
                       >
@@ -330,7 +396,9 @@ export default function ReceiptDetail({
             </div>
           )}
 
-          {isWalletConnected && <Separator className="bg-neutral-200" />}
+          {isWalletConnected && isCurrentUserParticipant && (
+            <Separator className="bg-neutral-200" />
+          )}
 
           {/* Footer */}
           <div className="text-center space-y-3 pt-2">

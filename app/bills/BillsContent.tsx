@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
 import { SplitBill } from "@/lib/types";
 import {
   Users,
@@ -13,8 +14,8 @@ import {
   Plus,
   Wallet as WalletIcon,
 } from "lucide-react";
-import Link from "next/link";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -195,65 +196,110 @@ export default function BillsContent() {
     );
   };
 
-  const ReceiptItem = ({ bill }: { bill: SplitBill }) => (
-    <Link href={`/receipts/${bill.id}`}>
-      <Card className="hover:shadow-xl transition-all duration-300 hover:scale-[1.02] animate-fade-in cursor-pointer bg-gradient-to-br from-white/95 to-[var(--brand-accent)]/10 backdrop-blur-sm border-2 border-[var(--brand-accent)]/40 shadow-lg hover:border-[var(--brand-accent)]/60">
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <CardTitle className="text-sm font-bold tracking-wide text-neutral-900">
-                {bill.title.toUpperCase()}
-              </CardTitle>
-              {bill.description && (
-                <CardDescription className="text-xs mt-1 text-neutral-600">
-                  {bill.description}
-                </CardDescription>
-              )}
-            </div>
-            <Badge
-              variant="secondary"
-              className="text-[10px] tracking-wide px-2 py-0.5 rounded-full bg-gradient-to-r from-[var(--brand-accent)]/20 to-[var(--brand-accent)]/30 border-2 border-[var(--brand-accent)] text-[var(--brand-accent)] shadow-sm hover:from-[var(--brand-accent)]/30 hover:to-[var(--brand-accent)]/40"
-            >
-              RECEIPT
-            </Badge>
-          </div>
-        </CardHeader>
+  const ReceiptItem = ({ bill }: { bill: SplitBill }) => {
+    const { address } = useAccount();
+    const router = useRouter();
 
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-neutral-700">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <DollarSign className="w-3 h-3 text-brand-primary" />
-                <span className="font-medium text-neutral-900">
-                  ${Number(bill.totalAmount).toFixed(2)}
-                </span>
+    const handleClick = async (e: React.MouseEvent) => {
+      e.preventDefault();
+
+      try {
+        // Check if current user already has NFT for this bill by looking at participants array
+        const currentParticipant = bill.participants?.find(
+          (participant) =>
+            participant.address?.toLowerCase() === address?.toLowerCase(),
+        );
+
+        if (currentParticipant?.nftReceiptId) {
+          // If user already has NFT, redirect to NFT page
+          router.push(`/nfts/${currentParticipant.nftReceiptId}`);
+          return;
+        }
+
+        // Fallback: check if user has NFT in storage
+        if (address) {
+          try {
+            const { getNFTByBillId } = await import("@/lib/nft-storage");
+            const userNFTs = await getNFTByBillId(bill.id, address);
+            if (userNFTs.length > 0) {
+              // If user has NFT in storage, redirect to NFT page
+              router.push(`/nfts/${userNFTs[0].id}`);
+              return;
+            }
+          } catch (error) {
+            console.error("Error checking NFT storage:", error);
+          }
+        }
+
+        // If no NFT found, redirect to receipt page where user can generate NFT
+        router.push(`/receipts/${bill.id}`);
+      } catch (error) {
+        console.error("Error handling click:", error);
+        // Fallback to receipt page on error
+        router.push(`/receipts/${bill.id}`);
+      }
+    };
+
+    return (
+      <div onClick={handleClick}>
+        <Card className="hover:shadow-xl transition-all duration-300 hover:scale-[1.02] animate-fade-in cursor-pointer bg-gradient-to-br from-white/95 to-[var(--brand-accent)]/10 backdrop-blur-sm border-2 border-[var(--brand-accent)]/40 shadow-lg hover:border-[var(--brand-accent)]/60">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <CardTitle className="text-sm font-bold tracking-wide text-neutral-900">
+                  {bill.title.toUpperCase()}
+                </CardTitle>
+                {bill.description && (
+                  <CardDescription className="text-xs mt-1 text-neutral-600">
+                    {bill.description}
+                  </CardDescription>
+                )}
+              </div>
+              <Badge
+                variant="secondary"
+                className="text-[10px] tracking-wide px-2 py-0.5 rounded-full bg-gradient-to-r from-[var(--brand-accent)]/20 to-[var(--brand-accent)]/30 border-2 border-[var(--brand-accent)] text-[var(--brand-accent)] shadow-sm hover:from-[var(--brand-accent)]/30 hover:to-[var(--brand-accent)]/40"
+              >
+                RECEIPT
+              </Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-neutral-700">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
+                  <DollarSign className="w-3 h-3 text-brand-primary" />
+                  <span className="font-medium text-neutral-900">
+                    ${Number(bill.totalAmount).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="w-3 h-3 text-brand-secondary" />
+                  <span className="text-neutral-800">
+                    {bill.participants.length}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-brand-secondary" />
-                <span className="text-neutral-800">
-                  {bill.participants.length}
+                <Calendar className="w-3 h-3 text-neutral-500" />
+                <span className="text-neutral-700">
+                  {formatDate(bill.createdAt)}
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-neutral-500" />
-              <span className="text-neutral-700">
-                {formatDate(bill.createdAt)}
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-neutral-600 bg-[var(--brand-accent)]/10 px-2 py-1 rounded-md border border-[var(--brand-accent)]/20">
-              Creator: {bill.creatorAddress.slice(0, 6)}...
-              {bill.creatorAddress.slice(-4)}
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-neutral-600 bg-[var(--brand-accent)]/10 px-2 py-1 rounded-md border border-[var(--brand-accent)]/20">
+                Creator: {bill.creatorAddress.slice(0, 6)}...
+                {bill.creatorAddress.slice(-4)}
+              </div>
+              <CheckCircle className="w-4 h-4 text-[var(--brand-accent)]" />
             </div>
-            <CheckCircle className="w-4 h-4 text-[var(--brand-accent)]" />
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
 
   const LoadingSkeleton = () => (
     <div className="space-y-4">

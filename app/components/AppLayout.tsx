@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Wallet, Check, Home, Receipt, Users, Star } from "lucide-react";
 import BottomNavigation from "./ui/bottom-navigation";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface AppLayoutProps {
@@ -28,7 +28,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const openUrl = useOpenUrl();
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     setMounted(true);
@@ -146,9 +145,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 let isActive = false;
-                if (item.label === "Home") {
-                  isActive = pathname === "/" && !searchParams.get("action");
-                } else if (item.label === "Bills") {
+                            if (item.label === "Home") {
+              isActive = pathname === "/";
+            } else if (item.label === "Bills") {
                   isActive = pathname === "/bills";
                 } else if (item.label === "Create") {
                   isActive = pathname === "/create";

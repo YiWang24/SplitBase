@@ -37,13 +37,6 @@ export default function LeaderboardPage() {
   const { isConnected, address } = useAccount();
   const [friends, setFriends] = useState<Friend[]>([]);
 
-  // Load friends from localStorage on mount
-  useEffect(() => {
-    if (isConnected && address) {
-      loadFriends();
-    }
-  }, [isConnected, address]);
-
   const loadFriends = useCallback(async () => {
     if (address) {
       try {
@@ -55,6 +48,13 @@ export default function LeaderboardPage() {
       }
     }
   }, [address]);
+
+  // Load friends from localStorage on mount
+  useEffect(() => {
+    if (isConnected && address) {
+      loadFriends();
+    }
+  }, [isConnected, address, loadFriends]);
 
   const topFriends = getTopFriends(friends, 20); // Show top 20 friends
 
