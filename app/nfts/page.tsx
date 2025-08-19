@@ -221,12 +221,15 @@ export default function NFTGalleryPage() {
           <Card className="bg-error-light border-error-main/30">
             <CardContent className="p-6 text-center">
               <p className="text-error-dark">{error}</p>
-              <Button
-                onClick={fetchNFTs}
-                className="mt-4 bg-brand-gradient hover:bg-brand-gradient-dark text-white"
-              >
-                Try Again
-              </Button>
+              {/* Only show Try Again button if wallet is connected */}
+              {isConnected && address && (
+                <Button
+                  onClick={fetchNFTs}
+                  className="mt-4 bg-brand-gradient hover:bg-brand-gradient-dark text-white"
+                >
+                  Try Again
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}

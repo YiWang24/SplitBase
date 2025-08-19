@@ -16,7 +16,7 @@ const config = createConfig({
     [baseSepolia.id]: http(),
   },
   // Enable connection persistence
-  ssr: false,
+  ssr: true,
 });
 
 export function Providers(props: { children: ReactNode }) {

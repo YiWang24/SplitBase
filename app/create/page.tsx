@@ -32,7 +32,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-6 pb-20 overflow-x-hidden">
+    <div className="w-full max-w-md mx-auto px-4 py-6 pb-20">
       {/* Enhanced Header */}
       <div className="mb-8 text-center">
         {/* Main Title with Icon */}

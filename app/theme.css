@@ -6,33 +6,33 @@
 @tailwind utilities;
 
 :root {
-  /* Brand color system */
-  --brand-primary: #c9e265; /* Primary - bright yellow-green */
-  --brand-secondary: #89d957; /* Secondary - fresh green */
-  --brand-primary-light: #d7ea8a; /* Primary (light) */
-  --brand-primary-dark: #b8d14a; /* Primary (dark) */
-  --brand-secondary-light: #a0e06a; /* Secondary (light) */
-  --brand-secondary-dark: #7ac94a; /* Secondary (dark) */
-  --brand-accent: #6bbf3a; /* Accent - deep green */
-  --brand-accent-light: #8cd45a; /* Accent (light) */
+  /* Brand color system - 调整为更柔和的色调 */
+  --brand-primary: #a8c44a; /* Primary - 更柔和的黄绿色 */
+  --brand-secondary: #6ba83a; /* Secondary - 更深的绿色 */
+  --brand-primary-light: #b8d14a; /* Primary (light) - 更柔和 */
+  --brand-primary-dark: #8ba63a; /* Primary (dark) - 更深 */
+  --brand-secondary-light: #7ac94a; /* Secondary (light) - 更柔和 */
+  --brand-secondary-dark: #5a7a4a; /* Secondary (dark) - 更深 */
+  --brand-accent: #4a7a3a; /* Accent - 更深的绿色 */
+  --brand-accent-light: #5a8a4a; /* Accent (light) - 更柔和 */
 
-  /* Neutral color system */
-  --neutral-50: #f8faf5; /* Lightest background */
-  --neutral-100: #f1f5ed; /* Light background */
-  --neutral-200: #e3e9d7; /* Border color */
-  --neutral-300: #cbd5b3; /* Input background */
-  --neutral-400: #a3b583; /* Disabled state */
-  --neutral-500: #7a9563; /* Secondary text */
-  --neutral-600: #5a7a4a; /* Primary text */
-  --neutral-700: #3d5f35; /* Dark text */
-  --neutral-800: #2a4528; /* Dark background */
-  --neutral-900: #1a2b1a; /* Darkest */
+  /* Neutral color system - 调整为更柔和的色调 */
+  --neutral-50: #f5f7f0; /* Lightest background - 更柔和 */
+  --neutral-100: #e8ede0; /* Light background - 更柔和 */
+  --neutral-200: #d4dcc8; /* Border color - 更柔和 */
+  --neutral-300: #b8c4a0; /* Input background - 更柔和 */
+  --neutral-400: #8a9a6a; /* Disabled state - 更柔和 */
+  --neutral-500: #6a7a4a; /* Secondary text - 更柔和 */
+  --neutral-600: #4a5a3a; /* Primary text - 更深 */
+  --neutral-700: #2a3a2a; /* Dark text - 更深 */
+  --neutral-800: #1a2a1a; /* Dark background - 更深 */
+  --neutral-900: #0f1a0f; /* Darkest - 更深 */
 
-  /* Semantic colors */
-  --success: #89d957;
-  --warning: #ffc107;
-  --error: #dc3545;
-  --info: #17a2b8;
+  /* Semantic colors - 调整为更柔和的色调 */
+  --success: #6ba83a;
+  --warning: #d4a017;
+  --error: #b84a4a;
+  --info: #4a8a8a;
 
   /* App background and foreground */
   --app-background: var(--neutral-50);
@@ -41,10 +41,10 @@
   --app-accent: var(--brand-primary);
   --app-accent-hover: var(--brand-primary-dark);
   --app-accent-active: var(--brand-accent);
-  --app-accent-light: rgba(201, 226, 101, 0.1);
+  --app-accent-light: rgba(168, 196, 74, 0.08);
   --app-gray: var(--neutral-100);
   --app-gray-dark: var(--neutral-200);
-  --app-card-bg: rgba(255, 255, 255, 0.95);
+  --app-card-bg: rgba(245, 247, 240, 0.95);
   --app-card-border: var(--brand-primary);
 
   /* Card styles */
@@ -61,10 +61,10 @@
     --app-accent: var(--brand-primary);
     --app-accent-hover: var(--brand-primary-light);
     --app-accent-active: var(--brand-secondary);
-    --app-accent-light: rgba(201, 226, 101, 0.15);
+    --app-accent-light: rgba(168, 196, 74, 0.12);
     --app-gray: var(--neutral-800);
     --app-gray-dark: var(--neutral-700);
-    --app-card-bg: rgba(42, 69, 40, 0.95);
+    --app-card-bg: rgba(26, 42, 26, 0.95);
     --app-card-border: var(--brand-primary);
   }
 }
@@ -103,9 +103,9 @@
   --ock-bg-secondary: var(--app-gray);
   --ock-bg-secondary-hover: var(--app-gray-dark);
   --ock-bg-secondary-active: var(--neutral-700);
-  --ock-bg-error: rgba(220, 53, 69, 0.1);
-  --ock-bg-warning: rgba(255, 193, 7, 0.1);
-  --ock-bg-success: rgba(137, 217, 87, 0.1);
+  --ock-bg-error: rgba(184, 74, 74, 0.08);
+  --ock-bg-warning: rgba(212, 160, 23, 0.08);
+  --ock-bg-success: rgba(107, 168, 58, 0.08);
   --ock-bg-default-reverse: var(--app-foreground);
 
   /* Icon colors */
@@ -171,23 +171,23 @@ body {
     border: 2px solid var(--brand-secondary);
   }
 
-  /* Brand shadow styles */
+  /* Brand shadow styles - 调整为更柔和的阴影 */
   .brand-shadow {
     box-shadow:
-      0 4px 20px rgba(201, 226, 101, 0.15),
-      0 2px 8px rgba(201, 226, 101, 0.1);
+      0 4px 20px rgba(168, 196, 74, 0.12),
+      0 2px 8px rgba(168, 196, 74, 0.08);
   }
 
   .brand-shadow-lg {
     box-shadow:
-      0 8px 30px rgba(201, 226, 101, 0.2),
-      0 4px 16px rgba(201, 226, 101, 0.15);
+      0 8px 30px rgba(168, 196, 74, 0.16),
+      0 4px 16px rgba(168, 196, 74, 0.12);
   }
 
   .brand-glow {
     box-shadow:
-      0 0 20px rgba(201, 226, 101, 0.3),
-      0 0 40px rgba(201, 226, 101, 0.2);
+      0 0 20px rgba(168, 196, 74, 0.2),
+      0 0 40px rgba(168, 196, 74, 0.15);
   }
 
   /* Brand card styles */
@@ -196,8 +196,8 @@ body {
     border: 2px solid var(--brand-primary);
     border-radius: var(--app-card-radius);
     box-shadow:
-      0 4px 20px rgba(201, 226, 101, 0.15),
-      0 2px 8px rgba(201, 226, 101, 0.1);
+      0 4px 20px rgba(168, 196, 74, 0.12),
+      0 2px 8px rgba(168, 196, 74, 0.08);
     position: relative;
     overflow: hidden;
   }
@@ -207,8 +207,8 @@ body {
     border: 2px solid var(--brand-secondary);
     border-radius: var(--app-card-radius);
     box-shadow:
-      0 4px 20px rgba(137, 217, 87, 0.15),
-      0 2px 8px rgba(137, 217, 87, 0.1);
+      0 4px 20px rgba(107, 168, 58, 0.12),
+      0 2px 8px rgba(107, 168, 58, 0.08);
     position: relative;
     overflow: hidden;
   }
@@ -227,7 +227,7 @@ body {
     background: var(--brand-primary-dark);
     border-color: var(--brand-primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(201, 226, 101, 0.3);
+    box-shadow: 0 4px 12px rgba(168, 196, 74, 0.25);
   }
 
   .brand-button-secondary {
@@ -243,7 +243,7 @@ body {
     background: var(--brand-secondary-dark);
     border-color: var(--brand-secondary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(137, 217, 87, 0.3);
+    box-shadow: 0 4px 12px rgba(107, 168, 58, 0.25);
   }
 
   /* Brand gradient backgrounds */
@@ -288,7 +288,7 @@ body {
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(201, 226, 101, 0.4),
+      rgba(168, 196, 74, 0.3),
       transparent
     );
     background-size: 200% 100%;
@@ -375,13 +375,13 @@ body {
   0%,
   100% {
     box-shadow:
-      0 4px 20px rgba(201, 226, 101, 0.15),
-      0 2px 8px rgba(201, 226, 101, 0.1);
+      0 4px 20px rgba(168, 196, 74, 0.12),
+      0 2px 8px rgba(168, 196, 74, 0.08);
   }
   50% {
     box-shadow:
-      0 6px 30px rgba(201, 226, 101, 0.25),
-      0 4px 16px rgba(201, 226, 101, 0.2);
+      0 6px 30px rgba(168, 196, 74, 0.2),
+      0 4px 16px rgba(168, 196, 74, 0.15);
   }
 }
 

@@ -50,7 +50,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border z-50 shadow-lg overflow-x-hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-neutral-50/90 border-t-2 border-neutral-200 z-50 shadow-lg overflow-x-hidden backdrop-blur-sm dark:bg-neutral-800/90 dark:border-neutral-700">
       <div className="max-w-md mx-auto px-4">
         <div className="flex justify-around py-3">
           {navItems.map((item) => {
@@ -79,8 +79,8 @@ export default function BottomNavigation() {
                   className={cn(
                     "flex flex-col h-auto py-2 px-3 font-mono text-xs tracking-wider transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground transform -translate-y-0.5 shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-accent hover:transform hover:-translate-y-0.5",
+                      ? "bg-brand-primary text-neutral-900 transform -translate-y-0.5 shadow-md hover:bg-brand-primary-dark"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:transform hover:-translate-y-0.5",
                   )}
                 >
                   <Icon className="w-5 h-5 mb-1" />
@@ -99,8 +99,8 @@ export default function BottomNavigation() {
                   className={cn(
                     "flex flex-col h-auto py-2 px-3 font-mono text-xs tracking-wider transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground transform -translate-y-0.5 shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-accent hover:transform hover:-translate-y-0.5",
+                      ? "bg-brand-primary text-neutral-900 transform -translate-y-0.5 shadow-md hover:bg-brand-primary-dark"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:transform hover:-translate-y-0.5",
                   )}
                 >
                   <Icon className="w-5 h-5 mb-1" />

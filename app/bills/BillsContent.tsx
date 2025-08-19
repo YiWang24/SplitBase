@@ -371,7 +371,7 @@ export default function BillsContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-4 w-full overflow-x-hidden">
+      <div className="max-w-md mx-auto px-4 py-4 w-full">
         <Tabs
           value={activeTab}
           onValueChange={(value) =>

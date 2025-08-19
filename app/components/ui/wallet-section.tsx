@@ -62,8 +62,8 @@ export default function WalletSection() {
   if (isConnecting || isReconnecting) {
     return (
       <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 bg-primary rounded-full animate-pulse"></div>
-        <div className="text-xs text-primary">Connecting...</div>
+        <div className="w-6 h-6 bg-brand-primary rounded-full animate-pulse"></div>
+        <div className="text-xs text-brand-primary">Connecting...</div>
       </div>
     );
   }
@@ -76,35 +76,35 @@ export default function WalletSection() {
 
   return (
     <>
-        <Wallet>
-          <ConnectWallet>
-            {isConnected ? (
-              <Identity
-                address={address}
-                schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
-                className="flex items-center space-x-2 bg-inherit  rounded-lg px-2 py-1"
-              >
-                <Avatar className="w-4 h-4 rounded-full" />
-                <Name className="text-inherit text-xs font-medium">
-                  <Badge tooltip={true} />
-                </Name>
-              </Identity>
-            ) : (
-              <>
-                <WalletIcon className="w-4 h-4" />
-                <span className="text-xs">Connect</span>
-              </>
-            )}
-          </ConnectWallet>
-
-          {/* Connected wallet click trigger */}
-          {isConnected && (
-            <div
-              className="absolute inset-0 cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={handleWalletClick}
-            />
+      <Wallet>
+        <ConnectWallet>
+          {isConnected ? (
+            <Identity
+              address={address}
+              schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+              className="flex items-center space-x-2 bg-inherit  rounded-lg px-2 py-1"
+            >
+              <Avatar className="w-4 h-4 rounded-full" />
+              <Name className="text-inherit text-xs font-medium">
+                <Badge tooltip={true} />
+              </Name>
+            </Identity>
+          ) : (
+            <>
+              <WalletIcon className="w-4 h-4" />
+              <span className="text-xs">Connect</span>
+            </>
           )}
-        </Wallet>
+        </ConnectWallet>
+
+        {/* Connected wallet click trigger */}
+        {isConnected && (
+          <div
+            className="absolute inset-0 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleWalletClick}
+          />
+        )}
+      </Wallet>
 
       {/* Wallet Modal */}
       <WalletModal isOpen={showModal} onClose={() => setShowModal(false)} />
