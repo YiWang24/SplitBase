@@ -70,28 +70,60 @@ export async function getNFT(
   }
 
   try {
-    const userIdToUse = userId || "anonymous";
-    const nftKey = `nft:${userIdToUse}:${nftId}`;
-
-    const nftDataString = await redis.get(nftKey);
-    if (!nftDataString) {
-      return null;
+    // First try to find NFT with the provided userId
+    if (userId) {
+      const nftKey = `nft:${userId}:${nftId}`;
+      const nftDataString = await redis.get(nftKey);
+      if (nftDataString) {
+        // Handle different data types
+        if (typeof nftDataString === "string") {
+          return JSON.parse(nftDataString) as NFTData;
+        } else if (
+          typeof nftDataString === "object" &&
+          nftDataString !== null
+        ) {
+          return nftDataString as NFTData;
+        }
+      }
     }
 
-    // Handle different data types
-    if (typeof nftDataString === "string") {
-      // If it's a string, try to parse as JSON
-      return JSON.parse(nftDataString) as NFTData;
-    } else if (typeof nftDataString === "object" && nftDataString !== null) {
-      // If it's already an object, use it directly
-      return nftDataString as NFTData;
-    } else {
-      console.error(
-        `Unexpected data type for ${nftKey}:`,
-        typeof nftDataString,
-      );
-      return null;
+    // If not found with userId, try to find it globally
+    // Search through all users to find the NFT
+    const allUsersKey = "all_nfts";
+    const allNftIds = await redis.smembers(allUsersKey);
+
+    for (const globalNftId of allNftIds) {
+      if (globalNftId === nftId) {
+        // Found the NFT ID, now find which user owns it
+        // Search through all user NFT lists
+        const userPattern = "user_nfts:*";
+        const userKeys = await redis.keys(userPattern);
+
+        for (const userKey of userKeys) {
+          const userNftIds = await redis.smembers(userKey);
+          if (userNftIds.includes(nftId)) {
+            // Extract userId from the key (user_nfts:userId)
+            const userIdFromKey = userKey.replace("user_nfts:", "");
+            const nftKey = `nft:${userIdFromKey}:${nftId}`;
+            const nftDataString = await redis.get(nftKey);
+
+            if (nftDataString) {
+              // Handle different data types
+              if (typeof nftDataString === "string") {
+                return JSON.parse(nftDataString) as NFTData;
+              } else if (
+                typeof nftDataString === "object" &&
+                nftDataString !== null
+              ) {
+                return nftDataString as NFTData;
+              }
+            }
+          }
+        }
+      }
     }
+
+    return null;
   } catch (error) {
     console.error("Error retrieving NFT:", error);
     throw new NFTStorageError("Failed to retrieve NFT", "RETRIEVAL_ERROR");

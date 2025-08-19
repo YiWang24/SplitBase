@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { NFTData } from "@/lib/nft-types";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Star,
   Users,
   Coins,
@@ -16,8 +15,6 @@ import {
   Calendar,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { formatAmount } from "@/lib/split-utils";
 import { useAccount } from "wagmi";
 
 export default function NFTDetailPage() {
@@ -37,14 +34,14 @@ export default function NFTDetailPage() {
         setIsLoading(true);
         setError(null);
 
-        // Only fetch NFT if user is connected
-        if (!isConnected || !address) {
-          setError("Please connect your wallet to view NFT details");
-          setIsLoading(false);
-          return;
-        }
+        // Try to fetch NFT regardless of wallet connection status
+        // If user is connected, use their address; otherwise, try without userId
+        const url =
+          isConnected && address
+            ? `/api/nft/${nftId}?userId=${address}`
+            : `/api/nft/${nftId}`;
 
-        const response = await fetch(`/api/nft/${nftId}?userId=${address}`);
+        const response = await fetch(url);
         const result = await response.json();
 
         if (result?.success && result?.data) {
@@ -126,16 +123,6 @@ export default function NFTDetailPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/nfts")}
-              className="text-neutral-600 hover:text-neutral-800"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to NFTs
-            </Button>
-            <div className="h-8 w-px bg-neutral-300" />
             <div>
               <h1 className="text-2xl font-bold text-neutral-800">
                 {nft.metadata.title}
@@ -150,13 +137,6 @@ export default function NFTDetailPage() {
             >
               {nft.metadata.rarity}
             </Badge>
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/bills/${nft.billId}`)}
-              className="text-brand-primary border-brand-primary hover:bg-brand-primary hover:text-white"
-            >
-              View Bill
-            </Button>
           </div>
         </div>
 
@@ -171,15 +151,6 @@ export default function NFTDetailPage() {
                 alt={nft.metadata.title}
                 className="w-full h-auto rounded-2xl border-4 border-brand-primary shadow-2xl"
               />
-
-              {/* Rarity Badge Overlay */}
-              <div className="absolute top-4 right-4">
-                <Badge
-                  className={`${getRarityColor(nft.metadata.rarity)} text-sm font-bold shadow-lg px-3 py-1`}
-                >
-                  {nft.metadata.rarity}
-                </Badge>
-              </div>
             </div>
 
             {/* Quick Stats */}
@@ -250,10 +221,8 @@ export default function NFTDetailPage() {
                   <span className="font-semibold text-neutral-700">
                     {new Date(nft.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",
-                      month: "long",
+                      month: "short",
                       day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
                     })}
                   </span>
                 </div>

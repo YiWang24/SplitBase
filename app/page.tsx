@@ -1,7 +1,15 @@
+"use client";
 import { Suspense } from "react";
 import AppContent from "./AppContent";
+import { useMiniKit } from "@coinbase/onchainkit/minikit";
+import { useEffect } from "react";
 
 export default function App() {
+  const { setFrameReady, isFrameReady } = useMiniKit();
+
+  useEffect(() => {
+    if (!isFrameReady) setFrameReady();
+  }, [isFrameReady, setFrameReady]);
   return (
     <Suspense
       fallback={

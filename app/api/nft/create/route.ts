@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateNFTId, storeNFT } from "@/lib/nft-storage";
 import { createNFTData } from "@/lib/nft-compositor";
 import { NFTGenerationParams } from "@/lib/nft-types";
+import { getSplitBill, updateSplitBill } from "@/lib/split-storage";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,8 @@ export async function POST(request: NextRequest) {
       params,
       imageData,
       userId,
-    }: { params: NFTGenerationParams; imageData: string; userId?: string } = body;
+    }: { params: NFTGenerationParams; imageData: string; userId?: string } =
+      body;
 
     // Validate required fields
     if (!params || !imageData) {
@@ -44,6 +46,19 @@ export async function POST(request: NextRequest) {
     const result = await storeNFT(nftData);
 
     if (result.success) {
+      // Update the bill with NFT information
+      try {
+        const bill = await getSplitBill(params.billId);
+        if (bill) {
+          bill.nftReceiptId = nftId;
+          bill.updatedAt = new Date();
+          await updateSplitBill(bill);
+        }
+      } catch (error) {
+        console.error("Error updating bill with NFT ID:", error);
+        // Don't fail the NFT creation if bill update fails
+      }
+
       return NextResponse.json({
         success: true,
         nftId: result.nftId,

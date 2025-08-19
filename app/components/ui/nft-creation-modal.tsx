@@ -43,6 +43,38 @@ export default function NFTCreationModal({
 
   const { error, handleError, clearError } = useNFTErrorHandler();
 
+  // Function to calculate dynamic height
+  const calculateCanvasHeight = useCallback((participantCount: number) => {
+    // Base height: scene(140) + title area(60) + amount area(40) + bottom footer(40) = 280
+    const baseHeight = 280;
+
+    // Avatar area height: max 4 avatars per row, each avatar height(48) + spacing(60) + text area(50)
+    const avatarsPerRow = Math.min(participantCount, 4);
+    const rows = Math.ceil(participantCount / avatarsPerRow);
+    const avatarSectionHeight = rows * (48 + 60 + 50);
+
+    // Participants info text area
+    const participantsInfoHeight = 50;
+
+    // Total height = base height + avatar area height + participants info height + extra spacing
+    return baseHeight + avatarSectionHeight + participantsInfoHeight + 20;
+  }, []);
+
+  // Common parameters for generating preview and final NFT
+  const getNFTGenerationOptions = useCallback(
+    (participantCount: number, isPreview: boolean = false) => {
+      const height = calculateCanvasHeight(participantCount);
+
+      return {
+        canvasWidth: isPreview ? 300 : 300, // Small size for preview, large size for final
+        canvasHeight: height,
+        avatarSize: isPreview ? 48 : 48, // Small avatars for preview, large avatars for final
+        includeMetadata: false, // Keep consistent with HTML layout
+      };
+    },
+    [calculateCanvasHeight],
+  );
+
   // Generate preview when options change
   const generatePreview = useCallback(async () => {
     if (!isOpen) return;
@@ -62,12 +94,8 @@ export default function NFTCreationModal({
         billTitle: bill.title,
       };
 
-      const imageData = await generateCompleteNFT(params, {
-        canvasWidth: 300,
-        canvasHeight: 600,
-        avatarSize: 48,
-        includeMetadata: true,
-      });
+      const options = getNFTGenerationOptions(bill.participantCount, true);
+      const imageData = await generateCompleteNFT(params, options);
 
       setPreviewImage(imageData);
     } catch (err) {
@@ -75,7 +103,15 @@ export default function NFTCreationModal({
     } finally {
       setIsGenerating(false);
     }
-  }, [isOpen, bill, location, timeOfDay, clearError, handleError]);
+  }, [
+    isOpen,
+    bill,
+    location,
+    timeOfDay,
+    clearError,
+    handleError,
+    getNFTGenerationOptions,
+  ]);
 
   // Generate preview on mount and option changes
   useEffect(() => {
@@ -105,9 +141,10 @@ export default function NFTCreationModal({
       setGenerationStep(1);
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Step 2: Generate full-size NFT
+      // Step 2: Generate full-size NFT with same parameters as preview
       setGenerationStep(2);
-      const imageData = await generateCompleteNFT(params);
+      const options = getNFTGenerationOptions(bill.participantCount, false);
+      const imageData = await generateCompleteNFT(params, options);
 
       // Step 3: Storing NFT
       setGenerationStep(3);
@@ -133,6 +170,10 @@ export default function NFTCreationModal({
         // Step 4: Complete
         setGenerationStep(4);
         await new Promise((resolve) => setTimeout(resolve, 500));
+
+        console.log("NFT creation completed successfully:", result);
+        console.log("NFT ID:", result.nftId);
+        console.log("Calling onNFTCreated callback...");
 
         onNFTCreated(result.nftId);
         onClose();

@@ -101,7 +101,6 @@ export default function SplitBillDetail({
           action: "join",
           billId,
           participantAddress: address,
-          // TODO: Get user's Basename
           participantBasename: undefined,
           displayName: undefined,
         }),
@@ -462,7 +461,7 @@ export default function SplitBillDetail({
       )}
 
       {/* Cannot Join Message */}
-      {!isCreator && !userParticipant && !canJoinResult.canJoin && (
+      {address && !isCreator && !userParticipant && !canJoinResult.canJoin && (
         <Card className="text-center p-6 bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200/50">
           <CardContent className="space-y-2">
             <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
@@ -473,8 +472,8 @@ export default function SplitBillDetail({
         </Card>
       )}
 
-      {/* Wallet Not Connected Message */}
-      {!address && (
+      {/* Wallet Not Connected Message - Only show if there are still available slots */}
+      {!address && bill.participants.length < bill.participantCount && (
         <Card className="text-center p-6 bg-gradient-to-r from-yellow-50 to-yellow-100/50 border-2 border-yellow-200/50">
           <CardContent className="space-y-2">
             <AlertCircle className="mx-auto h-8 w-8 text-yellow-500" />
@@ -495,16 +494,6 @@ export default function SplitBillDetail({
           amount={formatAmount(bill.amountPerPerson, 2)}
         />
       )}
-
-      {/* Completion Modal - Removed auto-popup */}
-      {/* {bill && (
-        <CompletionModal
-          isOpen={showCompletionModal}
-          onClose={() => setShowCompletionModal(false)}
-          bill={bill}
-          onCreateNFT={handleCreateNFT}
-        />
-      )} */}
     </div>
   );
 }

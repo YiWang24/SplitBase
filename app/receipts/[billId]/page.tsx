@@ -42,11 +42,35 @@ export default function ReceiptDetailPage() {
   };
 
   const handleNFTCreated = (nftId: string) => {
+    console.log("=== handleNFTCreated called ===");
     console.log("NFT created successfully:", nftId);
+    console.log("Current billId:", billId);
+    console.log("Preparing to navigate to:", `/nfts/${nftId}`);
+
     setShowNFTModal(false);
 
-    // Redirect to the newly created NFT detail page
-    router.push(`/nfts/${nftId}`);
+    // Refresh bill data to get updated NFT information
+    const refreshBill = async () => {
+      try {
+        const response = await fetch(`/api/split/${billId}`);
+        const result = await response.json();
+        if (result?.success && result?.data) {
+          setBill(result.data as SplitBill);
+          console.log("Bill data refreshed successfully");
+        }
+      } catch (error) {
+        console.error("Error refreshing bill:", error);
+      }
+    };
+
+    refreshBill();
+
+    // Add a delay to show the success message
+    console.log("Scheduling navigation in 1 second...");
+    setTimeout(() => {
+      console.log("Executing navigation to:", `/nfts/${nftId}`);
+      router.push(`/nfts/${nftId}`);
+    }, 500); 
   };
 
   return (

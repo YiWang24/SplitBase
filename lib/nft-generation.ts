@@ -109,7 +109,7 @@ export function generateCyberAvatar(
   ];
 
   // Modify pattern based on traits - direct copy from HTML
-  let modifiedPattern = [...avatarPattern];
+  const modifiedPattern = [...avatarPattern];
 
   // Add cyberware - direct copy from HTML
   if (traits.cyberware >= 1) {
@@ -501,7 +501,7 @@ export function generatePixelNeon(): void {
     amount: (amount / participants.length).toFixed(2),
   }));
 
-  const rarity = getRarityLevel(amount, participants.length);
+  // const rarity = getRarityLevel(amount, participants.length);
   const locationStyle = getLocationStyle(location);
   const locationName = getLocationName(location);
 

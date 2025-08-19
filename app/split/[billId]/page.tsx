@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import SplitBillDetail from "@/app/components/ui/split-bill-detail";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, AlertCircle } from "lucide-react";
@@ -10,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 export default function SplitBillPage() {
   const params = useParams();
   const router = useRouter();
+  const { address } = useAccount();
   const billId = params.billId as string;
   const [mounted, setMounted] = useState(false);
   const [message, setMessage] = useState<{
@@ -43,12 +45,14 @@ export default function SplitBillPage() {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <div className="flex justify-start">
-        <Button variant="ghost" size="sm" onClick={handleGoHome}>
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to Bills
-        </Button>
-      </div>
+      {address && (
+        <div className="flex justify-start">
+          <Button variant="ghost" size="sm" onClick={handleGoHome}>
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            Back to Bills
+          </Button>
+        </div>
+      )}
 
       {/* Message Alert */}
       {message && (

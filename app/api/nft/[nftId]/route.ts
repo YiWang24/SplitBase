@@ -3,12 +3,12 @@ import { getNFT } from "@/lib/nft-storage";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { nftId: string } },
+  { params }: { params: Promise<{ nftId: string }> },
 ) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId") || undefined;
-    const { nftId } = params;
+    const { nftId } = await params;
 
     if (!nftId) {
       return NextResponse.json(

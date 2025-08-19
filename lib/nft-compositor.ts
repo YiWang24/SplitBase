@@ -19,7 +19,7 @@ export interface NFTCompositionOptions {
 
 const DEFAULT_OPTIONS: Required<NFTCompositionOptions> = {
   canvasWidth: 400,
-  canvasHeight: 600, // Increased from 800 to 1000 for more vertical space
+  canvasHeight: 500, // Reduced from 600 to 500 to reduce bottom spacing
   avatarSize: 64,
   // Match HTML card layout which does not show a metadata block
   includeMetadata: false,
@@ -204,6 +204,7 @@ async function drawAvatarsSection(
   const startY = 300; // Adjusted avatar start position from 340 to 300, closer to amount area
   const avatarsPerRow = Math.min(avatars.length, 4);
   const spacing = (canvasWidth - 40) / avatarsPerRow;
+  const rowSpacing = avatarSize + 60; 
   // No background panel for avatars to match HTML
 
   // Load all avatars in parallel - direct copy from HTML
@@ -212,7 +213,7 @@ async function drawAvatarsSection(
       const row = Math.floor(index / avatarsPerRow);
       const col = index % avatarsPerRow;
       const x = 20 + col * spacing + (spacing - avatarSize) / 2;
-      const y = startY + row * (avatarSize + 50);
+      const y = startY + row * rowSpacing;
 
       const avatarImg = new Image();
       avatarImg.onload = () => {
@@ -273,26 +274,7 @@ async function drawAvatarsSection(
   // Wait for all avatars to load
   await Promise.all(avatarPromises);
 
-  // Draw connection line between avatars (if more than 1 avatar)
-  if (avatars.length > 1) {
-    const firstAvatarX = 20 + (spacing - avatarSize) / 2 + avatarSize / 2;
-    const lastAvatarX =
-      20 +
-      (avatars.length - 1) * spacing +
-      (spacing - avatarSize) / 2 +
-      avatarSize / 2;
-    const lineY = startY + avatarSize + 55; // Position below avatar amount
-
-    ctx.strokeStyle = "rgba(0,255,255,0.6)";
-    ctx.lineWidth = 1;
-    ctx.shadowColor = "#00ffff";
-    ctx.shadowBlur = 5;
-    ctx.beginPath();
-    ctx.moveTo(firstAvatarX, lineY);
-    ctx.lineTo(lastAvatarX, lineY);
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-  }
+  // Remove connection line drawing logic, no longer drawing connection lines between avatars
 
   // Participants count display with time vibes (HTML)
   ctx.fillStyle = "#00ff00";
@@ -300,10 +282,16 @@ async function drawAvatarsSection(
   ctx.textAlign = "center";
   ctx.shadowColor = "#00ff00";
   ctx.shadowBlur = 10;
+
+  // Calculate the bottom position of the last avatar, then add appropriate spacing below it
+  const lastAvatarBottom =
+    startY + Math.ceil(avatars.length / avatarsPerRow) * rowSpacing;
+  const participantsTextY = lastAvatarBottom + 30; // 30px below the last avatar
+
   ctx.fillText(
     `🧑‍🤝‍🧑 ${avatars.length} cyber-friends • ${timeOfDay} vibes`,
     canvasWidth / 2,
-    startY + 200, // Increased spacing to accommodate connection line
+    participantsTextY,
   );
   ctx.shadowBlur = 0;
 }
@@ -357,7 +345,7 @@ function drawFooterRow(
   opts: Required<NFTCompositionOptions>,
 ): void {
   const { canvasWidth, canvasHeight } = opts;
-  const y = canvasHeight - 80; // Adjusted bottom position for more space
+  const y = canvasHeight - 40; // Reduced from 80 to 40 to reduce bottom spacing
 
   // Divider line like HTML border-top
   ctx.strokeStyle = "rgba(0,255,255,0.2)";

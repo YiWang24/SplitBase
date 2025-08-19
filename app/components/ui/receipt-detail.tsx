@@ -118,6 +118,15 @@ export default function ReceiptDetail({
     setNftExists(true);
     setExistingNFTId(nftId);
     setShowNFTModal(false);
+
+    // Update local bill state to include NFT information
+    if (bill) {
+      setBill({
+        ...bill,
+        nftReceiptId: nftId,
+        updatedAt: new Date(),
+      });
+    }
   };
 
   if (isLoading) {
@@ -256,8 +265,8 @@ export default function ReceiptDetail({
 
           <Separator className="bg-neutral-200" />
 
-          {/* NFT Section - Only show if wallet is connected or NFT already exists */}
-          {(isWalletConnected || bill.nftReceiptId || nftExists) && (
+          {/* NFT Section - Only show if wallet is connected */}
+          {isWalletConnected && (
             <div className="space-y-4">
               <div className="flex items-start space-x-4 p-4 bg-gradient-to-br from-brand-primary/10 via-brand-secondary/10 to-brand-accent/10 rounded-xl border border-brand-primary/20">
                 <div className="w-10 h-10 bg-brand-gradient rounded-xl flex items-center justify-center">
@@ -286,9 +295,15 @@ export default function ReceiptDetail({
                         size="sm"
                         variant="outline"
                         className="border-success-main/50 text-success-dark hover:bg-success-main/10"
+                        onClick={() => {
+                          const nftId = bill.nftReceiptId || existingNFTId;
+                          if (nftId) {
+                            window.open(`/nfts/${nftId}`, "_blank");
+                          }
+                        }}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
-                        View
+                        View NFT
                       </Button>
                     </div>
                   ) : (
@@ -315,9 +330,7 @@ export default function ReceiptDetail({
             </div>
           )}
 
-          {(isWalletConnected || bill.nftReceiptId || nftExists) && (
-            <Separator className="bg-neutral-200" />
-          )}
+          {isWalletConnected && <Separator className="bg-neutral-200" />}
 
           {/* Footer */}
           <div className="text-center space-y-3 pt-2">
