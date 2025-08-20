@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Plus, Wallet, Check, Users, Zap, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Magic UI Components
 import { NeonGradientCard } from "@/components/magicui/neon-gradient-card";
@@ -15,7 +14,7 @@ export default function AppContent() {
   const router = useRouter();
 
   return (
-    <div className="w-full max-w-md md:max-w-none mx-auto px-4 py-2 pb-4 overflow-x-hidden">
+    <div className="w-full max-w-md md:max-w-none mx-auto px-4 py-2  overflow-x-hidden">
       {/* Hero Section */}
       <div className="space-y-6 md:space-y-0">
         {/* Main Hero */}
@@ -49,7 +48,7 @@ export default function AppContent() {
           </div>
 
           {/* Subtitle */}
-          <div className="text-sm md:text-lg font-semibold text-brand-primary bg-brand-primary/10 px-4 py-2 md:px-6 md:py-3 rounded-full inline-block border border-brand-primary/20 shadow-brand">
+          <div className="text-sm md:text-lg font-bold text-white bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent px-4 py-2 md:px-6 md:py-3 rounded-full inline-block border-2 border-white/30 shadow-brand-lg backdrop-blur-sm">
             ⚡ &lt;2s Settlement • Base Network • USDC
           </div>
         </div>
@@ -66,6 +65,8 @@ export default function AppContent() {
             TRANSPARENT
           </span>
         </div>
+
+       
 
         {/* Main CTA Button */}
         <div className="relative w-full md:py-8 md:bg-gradient-to-br md:from-neutral-50/50 md:to-neutral-100/50 md:mx-0 md:px-8">
@@ -227,68 +228,6 @@ export default function AppContent() {
               </div>
             </CardContent>
           </NeonGradientCard>
-        </div>
-
-        {/* Quick Actions - Web Layout */}
-        <div className="hidden md:block md:py-16 md:mx-0 md:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center">
-              <Card className="backdrop-blur-sm border-0 bg-gradient-to-br from-neutral-50/90 to-neutral-100/90 shadow-card max-w-2xl mx-auto">
-                <CardHeader>
-                  <CardTitle className="text-xl text-neutral-800">
-                    Quick Actions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button
-                    onClick={() => router.push("/bills")}
-                    variant="outline"
-                    className="w-full justify-start bg-white/70 hover:bg-white/90 border-brand-primary/20 text-brand-primary hover:text-brand-primary-dark transition-all duration-300 group h-12 text-base"
-                  >
-                    <Wallet className="mr-3 h-5 w-5" />
-                    View My Bills
-                  </Button>
-                  <Button
-                    onClick={() => router.push("/friends")}
-                    variant="outline"
-                    className="w-full justify-start bg-white/70 hover:bg-white/90 border-brand-secondary/20 text-brand-secondary hover:text-brand-secondary-dark transition-all duration-300 group h-12 text-base"
-                  >
-                    <Users className="mr-3 h-5 w-5" />
-                    Manage Friends
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions - Mobile Layout */}
-        <div className="md:hidden">
-          <Card className="backdrop-blur-sm border-0 bg-gradient-to-br from-neutral-50/90 to-neutral-100/90 shadow-card">
-            <CardHeader>
-              <CardTitle className="text-lg text-neutral-800">
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                onClick={() => router.push("/bills")}
-                variant="outline"
-                className="w-full justify-start bg-white/70 hover:bg-white/90 border-brand-primary/20 text-brand-primary hover:text-brand-primary-dark transition-all duration-300 group"
-              >
-                <Wallet className="mr-3 h-4 w-4" />
-                View My Bills
-              </Button>
-              <Button
-                onClick={() => router.push("/friends")}
-                variant="outline"
-                className="w-full justify-start bg-white/70 hover:bg-white/90 border-brand-secondary/20 text-brand-secondary hover:text-brand-secondary-dark transition-all duration-300 group"
-              >
-                <Users className="mr-3 h-4 w-4" />
-                Manage Friends
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

@@ -211,7 +211,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full overflow-y-auto overflow-x-hidden pt-20 pb-24 md:pb-0">
+      <main className="flex-1 w-full overflow-y-auto overflow-x-hidden pt-20 pb-20 md:pb-0">
         {children}
       </main>
 
