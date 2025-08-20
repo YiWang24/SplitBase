@@ -418,13 +418,13 @@ export default function CreateSplitForm({
 
     if (totalAmount < parseFloat(BASE_PAY_CONFIG.MIN_AMOUNT)) {
       errors.push(
-        `Total amount cannot be less than ${BASE_PAY_CONFIG.MIN_AMOUNT} USD`,
+        `Total amount cannot be less than ${BASE_PAY_CONFIG.MIN_AMOUNT} USDC`,
       );
     }
 
     if (totalAmount > parseFloat(BASE_PAY_CONFIG.MAX_AMOUNT)) {
       errors.push(
-        `Total amount cannot exceed ${BASE_PAY_CONFIG.MAX_AMOUNT} USD`,
+        `Total amount cannot exceed ${BASE_PAY_CONFIG.MAX_AMOUNT} USDC`,
       );
     }
 
@@ -597,7 +597,7 @@ export default function CreateSplitForm({
               <div className="flex items-center justify-between">
                 <p className="text-xs text-neutral-500 font-medium">
                   Choose a currency to input amount, it will be automatically
-                  converted to USD
+                  converted to USDC
                 </p>
                 <button
                   type="button"
@@ -724,7 +724,7 @@ export default function CreateSplitForm({
                               <span className="text-xs text-neutral-500">
                                 {exchangeRates[currency.apiCode] &&
                                 exchangeRates[currency.apiCode] > 0
-                                  ? `1 ${currency.code} = ${(1 / exchangeRates[currency.apiCode]).toFixed(6)} USD`
+                                  ? `1 ${currency.code} = ${(1 / exchangeRates[currency.apiCode]).toFixed(6)} USDC`
                                   : "Rate loading..."}
                               </span>
                             </div>
@@ -771,7 +771,7 @@ export default function CreateSplitForm({
                     </span>{" "}
                     ≈{" "}
                     <span className="font-bold text-[#c9e265]">
-                      {formData.totalAmount} USD
+                      {formData.totalAmount} USDC
                     </span>
                   </p>
                   <p className="text-xs text-neutral-500 mt-1">
@@ -780,7 +780,7 @@ export default function CreateSplitForm({
                     exchangeRates[selectedCurrency.apiCode] > 0
                       ? (1 / exchangeRates[selectedCurrency.apiCode]).toFixed(6)
                       : "loading..."}{" "}
-                    USD
+                    USDC
                     {isLoadingRates && (
                       <span className="ml-2 text-[#c9e265]">(Loading...)</span>
                     )}
@@ -837,7 +837,7 @@ export default function CreateSplitForm({
                 htmlFor="totalAmount"
                 className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
               >
-                TOTAL AMOUNT (USD) *
+                TOTAL AMOUNT (USDC) *
               </Label>
               <div className="relative">
                 <Input
@@ -858,12 +858,12 @@ export default function CreateSplitForm({
                   variant="secondary"
                   className="absolute right-3 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#6bbf3a] to-[#b8d14a] text-white border-0 px-3 py-1 font-bold text-xs"
                 >
-                  USD
+                  USDC
                 </Badge>
               </div>
               <p className="text-xs text-neutral-500 font-medium">
-                Min: {BASE_PAY_CONFIG.MIN_AMOUNT} USD • Max:{" "}
-                {BASE_PAY_CONFIG.MAX_AMOUNT} USD
+                Min: {BASE_PAY_CONFIG.MIN_AMOUNT} USDC • Max:{" "}
+                {BASE_PAY_CONFIG.MAX_AMOUNT} USDC
               </p>
             </div>
 
