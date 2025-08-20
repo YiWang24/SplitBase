@@ -5,6 +5,7 @@ import {
   deleteSplitBill,
 } from "@/lib/split-storage";
 import { addParticipant, updateParticipantPayment } from "@/lib/split-utils";
+import { manageFriendRelationships } from "@/lib/friend-utils";
 import {
   ApiResponse,
   JoinSplitBillInput,
@@ -102,6 +103,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         joinData.participantBasename,
         joinData.displayName,
       );
+
+      // After successfully adding participant, manage friend relationships
+      try {
+        await manageFriendRelationships(
+          updatedBill,
+          joinData.participantAddress,
+        );
+      } catch (friendError) {
+        console.warn("Failed to manage friend relationships:", friendError);
+        // Don't fail the entire operation if friend management fails
+      }
     } else if (action === "payment") {
       // Update payment status
       const paymentData: PaymentStatusUpdate = body;

@@ -169,6 +169,23 @@ const EXCHANGE_RATE_API = {
   baseCurrency: "USD",
 };
 
+// Utility function for precise currency conversion
+const convertCurrencyToUSD = (amount: string, rate: number): string => {
+  if (rate <= 0) return "0.00";
+
+  // Convert to number and perform division
+  const numericAmount = parseFloat(amount);
+  if (isNaN(numericAmount)) return "0.00";
+
+  // Convert other currency to USD: amount / rate = USD amount
+  const usdAmount = numericAmount / rate;
+
+  // Round to 2 decimal places to avoid floating point precision issues
+  const roundedAmount = Math.round(usdAmount * 100) / 100;
+
+  return roundedAmount.toFixed(2);
+};
+
 interface CreateSplitFormProps {
   onSuccess: (billId: string) => void;
   onError: (error: string) => void;
@@ -210,8 +227,8 @@ export default function CreateSplitForm({
   );
 
   // Fetch exchange rate data
-  const fetchExchangeRates = async () => {
-    if (Object.keys(exchangeRates).length > 0) return; // If exchange rates already exist, don't fetch again
+  const fetchExchangeRates = async (forceRefresh = false) => {
+    if (!forceRefresh && Object.keys(exchangeRates).length > 0) return; // If exchange rates already exist and not forcing refresh, don't fetch again
 
     setIsLoadingRates(true);
     setRatesError(null);
@@ -253,6 +270,11 @@ export default function CreateSplitForm({
     }
   };
 
+  // Handle refresh button click
+  const handleRefreshRates = () => {
+    fetchExchangeRates(true);
+  };
+
   // Share modal state
   const [showShareModal, setShowShareModal] = useState(false);
   const [createdBillData, setCreatedBillData] = useState<{
@@ -286,17 +308,42 @@ export default function CreateSplitForm({
     };
   }, [showCurrencySelector]);
 
+  // Auto-recalculate conversion when exchange rates update
+  useEffect(() => {
+    if (
+      otherCurrencyAmount &&
+      selectedCurrency.code !== "USD" &&
+      Object.keys(exchangeRates).length > 0
+    ) {
+      const rate =
+        exchangeRates[selectedCurrency.apiCode] || selectedCurrency.rate;
+      if (rate > 0) {
+        // Use the utility function for precise conversion
+        const usdAmount = convertCurrencyToUSD(otherCurrencyAmount, rate);
+        setFormData((prev) => ({
+          ...prev,
+          totalAmount: usdAmount,
+        }));
+      }
+    }
+  }, [exchangeRates, selectedCurrency, otherCurrencyAmount]);
+
   // Handle currency selection
   const handleCurrencySelect = (currency: (typeof CURRENCIES)[0]) => {
     setSelectedCurrency(currency);
     setShowCurrencySelector(false);
 
+    // If exchange rates are missing, try to fetch them
+    if (Object.keys(exchangeRates).length === 0) {
+      fetchExchangeRates(true);
+    }
+
     // If other currency input has value, automatically convert to USD
     if (otherCurrencyAmount && currency.code !== "USD") {
       const rate = exchangeRates[currency.apiCode] || currency.rate;
       if (rate > 0) {
-        // Convert other currency to USD: amount * (1/rate) = USD amount
-        const usdAmount = (parseFloat(otherCurrencyAmount) / rate).toFixed(2);
+        // Use the utility function for precise conversion
+        const usdAmount = convertCurrencyToUSD(otherCurrencyAmount, rate);
         setFormData((prev) => ({
           ...prev,
           totalAmount: usdAmount,
@@ -315,9 +362,16 @@ export default function CreateSplitForm({
     if (value && selectedCurrency.code !== "USD") {
       const rate =
         exchangeRates[selectedCurrency.apiCode] || selectedCurrency.rate;
+
+      // If exchange rates are missing, try to fetch them
+      if (rate === 0 && Object.keys(exchangeRates).length === 0) {
+        fetchExchangeRates(true);
+        return; // Wait for rates to be fetched before converting
+      }
+
       if (rate > 0) {
-        // Convert other currency to USD: amount * (1/rate) = USD amount
-        const usdAmount = (parseFloat(value) / rate).toFixed(2);
+        // Use the utility function for precise conversion
+        const usdAmount = convertCurrencyToUSD(value, rate);
         setFormData((prev) => ({
           ...prev,
           totalAmount: usdAmount,
@@ -547,7 +601,7 @@ export default function CreateSplitForm({
                 </p>
                 <button
                   type="button"
-                  onClick={fetchExchangeRates}
+                  onClick={handleRefreshRates}
                   disabled={isLoadingRates}
                   className="p-2 hover:bg-[#c9e265]/10 rounded-lg transition-colors duration-200 disabled:opacity-50"
                   title="Refresh exchange rates"
@@ -668,7 +722,8 @@ export default function CreateSplitForm({
                           {currency.code !== "USD" && (
                             <div className="text-right">
                               <span className="text-xs text-neutral-500">
-                                {exchangeRates[currency.apiCode]
+                                {exchangeRates[currency.apiCode] &&
+                                exchangeRates[currency.apiCode] > 0
                                   ? `1 ${currency.code} = ${(1 / exchangeRates[currency.apiCode]).toFixed(6)} USD`
                                   : "Rate loading..."}
                               </span>
@@ -721,9 +776,10 @@ export default function CreateSplitForm({
                   </p>
                   <p className="text-xs text-neutral-500 mt-1">
                     Rate: 1 {selectedCurrency.code} ={" "}
-                    {exchangeRates[selectedCurrency.apiCode]
+                    {exchangeRates[selectedCurrency.apiCode] &&
+                    exchangeRates[selectedCurrency.apiCode] > 0
                       ? (1 / exchangeRates[selectedCurrency.apiCode]).toFixed(6)
-                      : selectedCurrency.rate}{" "}
+                      : "loading..."}{" "}
                     USD
                     {isLoadingRates && (
                       <span className="ml-2 text-[#c9e265]">(Loading...)</span>
@@ -762,7 +818,7 @@ export default function CreateSplitForm({
                     {ratesError}
                     <button
                       type="button"
-                      onClick={fetchExchangeRates}
+                      onClick={handleRefreshRates}
                       className="ml-2 text-red-500 hover:text-red-700 underline text-xs"
                     >
                       Retry

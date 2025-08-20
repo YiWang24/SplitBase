@@ -5,7 +5,13 @@ import {
   UpdateFriendInput,
   ApiResponse,
 } from "@/lib/types";
-import { redis } from "@/lib/redis";
+import {
+  getFriendsFromStorage,
+  addFriendAsync,
+  updateFriend,
+  deleteFriend,
+  toggleFriendFavorite,
+} from "@/lib/friend-utils";
 
 // GET /api/friends - Get all friends for a user
 export async function GET(request: NextRequest) {
@@ -23,16 +29,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let friends: Friend[] = [];
-
-    // Try to get from Redis first
-    if (redis) {
-      const redisKey = `friends:${address}`;
-      const stored = await redis.get(redisKey);
-      if (stored) {
-        friends = stored as Friend[];
-      }
-    }
+    const friends = await getFriendsFromStorage(address);
 
     return NextResponse.json<ApiResponse<Friend[]>>({
       success: true,
@@ -77,22 +74,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newFriend: Friend = {
-      id: Date.now().toString(),
+    // Get the user's address from query params
+    const { searchParams } = new URL(request.url);
+    const userAddress = searchParams.get("userAddress");
+
+    if (!userAddress) {
+      return NextResponse.json<ApiResponse<Friend>>(
+        {
+          success: false,
+          error: "User address parameter is required",
+        },
+        { status: 400 },
+      );
+    }
+
+    const newFriend = await addFriendAsync(userAddress, {
       address,
       basename,
       nickname,
-      addedAt: new Date(),
-      isFavorite: false,
-    };
-
-    // Save to Redis if available
-    if (redis) {
-      const redisKey = `friends:${address}`;
-      const existingFriends = ((await redis.get(redisKey)) as Friend[]) || [];
-      const updatedFriends = [...existingFriends, newFriend];
-      await redis.set(redisKey, updatedFriends, { ex: 60 * 60 * 24 * 30 }); // 30 days expiry
-    }
+    });
 
     return NextResponse.json<ApiResponse<Friend>>(
       {
@@ -118,23 +118,37 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body: UpdateFriendInput = await request.json();
-    const { id } = body;
+    const { id, address, nickname, isFavorite } = body;
 
-    if (!id) {
+    if (!id || !address) {
       return NextResponse.json<ApiResponse<Friend>>(
         {
           success: false,
-          error: "Friend ID is required",
+          error: "Friend ID and address are required",
         },
         { status: 400 },
       );
     }
 
-    // In a real app, you'd update in a database
-    // For now, we'll just return success
+    const updatedFriend = await updateFriend(address, id, {
+      address,
+      nickname,
+      isFavorite,
+    });
+
+    if (!updatedFriend) {
+      return NextResponse.json<ApiResponse<Friend>>(
+        {
+          success: false,
+          error: "Friend not found",
+        },
+        { status: 404 },
+      );
+    }
 
     return NextResponse.json<ApiResponse<Friend>>({
       success: true,
+      data: updatedFriend,
       message: "Friend updated successfully",
     });
   } catch (error) {
@@ -154,19 +168,29 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const address = searchParams.get("address");
 
-    if (!id) {
+    if (!id || !address) {
       return NextResponse.json<ApiResponse<void>>(
         {
           success: false,
-          error: "Friend ID is required",
+          error: "Friend ID and address are required",
         },
         { status: 400 },
       );
     }
 
-    // In a real app, you'd delete from a database
-    // For now, we'll just return success
+    const success = await deleteFriend(address, id);
+
+    if (!success) {
+      return NextResponse.json<ApiResponse<void>>(
+        {
+          success: false,
+          error: "Friend not found",
+        },
+        { status: 404 },
+      );
+    }
 
     return NextResponse.json<ApiResponse<void>>({
       success: true,
@@ -178,6 +202,52 @@ export async function DELETE(request: NextRequest) {
       {
         success: false,
         error: "Failed to delete friend",
+      },
+      { status: 500 },
+    );
+  }
+}
+
+// PATCH /api/friends - Toggle favorite status
+export async function PATCH(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const address = searchParams.get("address");
+
+    if (!id || !address) {
+      return NextResponse.json<ApiResponse<Friend>>(
+        {
+          success: false,
+          error: "Friend ID and address are required",
+        },
+        { status: 400 },
+      );
+    }
+
+    const updatedFriend = await toggleFriendFavorite(address, id);
+
+    if (!updatedFriend) {
+      return NextResponse.json<ApiResponse<Friend>>(
+        {
+          success: false,
+          error: "Friend not found",
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json<ApiResponse<Friend>>({
+      success: true,
+      data: updatedFriend,
+      message: "Friend favorite status updated successfully",
+    });
+  } catch (error) {
+    console.error("Error toggling friend favorite:", error);
+    return NextResponse.json<ApiResponse<Friend>>(
+      {
+        success: false,
+        error: "Failed to update friend favorite status",
       },
       { status: 500 },
     );

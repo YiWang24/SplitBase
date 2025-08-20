@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AlertCircle } from "lucide-react";
+import { UserPlus, AlertCircle } from "lucide-react";
 import { Friend, AddFriendInput } from "@/lib/types";
 import { isValidEthereumAddress } from "@/lib/friend-utils";
 
@@ -23,6 +23,7 @@ interface FriendModalProps {
   friend?: Friend | null;
   onSubmit: (data: AddFriendInput & { isFavorite?: boolean }) => void;
   existingAddresses: string[];
+  currentUserAddress?: string;
 }
 
 export default function FriendModal({
@@ -32,6 +33,7 @@ export default function FriendModal({
   friend,
   onSubmit,
   existingAddresses,
+  currentUserAddress,
 }: FriendModalProps) {
   const [formData, setFormData] = useState<
     AddFriendInput & { isFavorite?: boolean }
@@ -71,11 +73,24 @@ export default function FriendModal({
         setAddressError("Please enter a valid Ethereum address");
       } else if (
         mode === "add" &&
+        currentUserAddress &&
+        trimmedAddress.toLowerCase() === currentUserAddress.toLowerCase()
+      ) {
+        setAddressError("You cannot add your own wallet address");
+      } else if (
+        mode === "add" &&
         existingAddresses.some(
           (addr) => addr.toLowerCase() === trimmedAddress.toLowerCase(),
         )
       ) {
         setAddressError("This address is already in your friends list");
+      } else if (
+        mode === "edit" &&
+        friend &&
+        currentUserAddress &&
+        trimmedAddress.toLowerCase() === currentUserAddress.toLowerCase()
+      ) {
+        setAddressError("You cannot use your own wallet address");
       } else if (
         mode === "edit" &&
         friend &&
@@ -92,7 +107,7 @@ export default function FriendModal({
     } else {
       setAddressError("");
     }
-  }, [formData.address, existingAddresses, mode, friend]);
+  }, [formData.address, existingAddresses, mode, friend, currentUserAddress]);
 
   const handleSubmit = () => {
     if (!formData.address.trim() || addressError) return;
@@ -113,20 +128,28 @@ export default function FriendModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "add" ? "Add New Friend" : "Edit Friend"}
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-[#fefce8] border-2 border-[#c9e265]/20 shadow-2xl">
+        <DialogHeader className="text-center pb-4">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#c9e265] to-[#89d957] rounded-2xl flex items-center justify-center shadow-lg mb-4">
+            <UserPlus className="h-8 w-8 text-neutral-900" />
+          </div>
+          <DialogTitle className="text-2xl font-black text-neutral-900 tracking-wide">
+            {mode === "add" ? "ADD NEW FRIEND" : "EDIT FRIEND"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base text-neutral-600 font-medium">
             {mode === "add"
               ? "Enter your friend's wallet address and details"
               : "Update your friend's information"}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-6 py-4">
           <div>
-            <Label htmlFor="modal-address">Wallet Address *</Label>
+            <Label
+              htmlFor="modal-address"
+              className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+            >
+              WALLET ADDRESS *
+            </Label>
             <Input
               id="modal-address"
               placeholder="0x..."
@@ -134,19 +157,26 @@ export default function FriendModal({
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className={
-                addressError ? "border-red-500 focus:border-red-500" : ""
-              }
+              className={`mt-2 h-12 border-2 transition-all duration-300 rounded-xl ${
+                addressError
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-[#c9e265]/20 focus:border-[#c9e265] focus:ring-[#c9e265]/20"
+              }`}
             />
             {addressError && (
-              <div className="flex items-center space-x-2 mt-1 text-sm text-red-500">
+              <div className="flex items-center space-x-2 mt-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
                 <AlertCircle className="h-4 w-4" />
-                <span>{addressError}</span>
+                <span className="font-medium">{addressError}</span>
               </div>
             )}
           </div>
           <div>
-            <Label htmlFor="modal-nickname">Nickname (Optional)</Label>
+            <Label
+              htmlFor="modal-nickname"
+              className="text-sm font-bold text-neutral-700 uppercase tracking-wide"
+            >
+              NICKNAME (OPTIONAL)
+            </Label>
             <Input
               id="modal-nickname"
               placeholder="Johnny"
@@ -154,10 +184,11 @@ export default function FriendModal({
               onChange={(e) =>
                 setFormData({ ...formData, nickname: e.target.value })
               }
+              className="mt-2 h-12 border-2 border-[#89d957]/20 focus:border-[#89d957] focus:ring-[#89d957]/20 transition-all duration-300 rounded-xl"
             />
           </div>
           {mode === "edit" && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-gradient-to-r from-[#c9e265]/10 to-[#89d957]/10 p-4 rounded-xl border border-[#c9e265]/20">
               <input
                 type="checkbox"
                 id="modal-favorite"
@@ -165,9 +196,14 @@ export default function FriendModal({
                 onChange={(e) =>
                   setFormData({ ...formData, isFavorite: e.target.checked })
                 }
-                className="rounded"
+                className="w-5 h-5 rounded border-2 border-[#c9e265] text-[#c9e265] focus:ring-[#c9e265]/20"
               />
-              <Label htmlFor="modal-favorite">Mark as favorite</Label>
+              <Label
+                htmlFor="modal-favorite"
+                className="text-sm font-bold text-neutral-700"
+              >
+                Mark as favorite
+              </Label>
             </div>
           )}
         </div>
@@ -175,14 +211,14 @@ export default function FriendModal({
           <Button
             onClick={handleSubmit}
             disabled={!!addressError || !formData.address.trim()}
-            className="min-w-[120px]"
+            className="min-w-[120px] h-12 bg-gradient-to-r from-[#c9e265] to-[#89d957] text-neutral-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0"
           >
             {mode === "add" ? "Add Friend" : "Update Friend"}
           </Button>
           <Button
             variant="outline"
             onClick={handleClose}
-            className="min-w-[120px]"
+            className="min-w-[120px] h-12 border-2 border-neutral-300 text-neutral-600 font-bold hover:bg-neutral-50 transition-all duration-300"
           >
             Cancel
           </Button>
