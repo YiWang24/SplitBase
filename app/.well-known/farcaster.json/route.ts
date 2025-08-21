@@ -40,7 +40,7 @@ export async function GET() {
       ogImageUrl: process.env.NEXT_PUBLIC_APP_OG_IMAGE,
     }),
     baseBuilder: {
-      allowedAddresses: ["0xa835412A327e14E39EbFfCFE977dE1BD261BfdA3"],
+      allowedAddresses: ["0x2c5e6F4E0fb15540bEe47357a6E595Ec3eeC9FcB"],
     },
   });
 }
