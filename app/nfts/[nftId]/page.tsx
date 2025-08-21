@@ -13,14 +13,17 @@ import {
   Hash,
   Shield,
   Calendar,
+  Share2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAccount } from "wagmi";
+import { useComposeCast } from "@coinbase/onchainkit/minikit";
 
 export default function NFTDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const { composeCast } = useComposeCast();
   const [nft, setNft] = useState<NFTData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +74,17 @@ export default function NFTDetailPage() {
       default:
         return "bg-neutral-200 text-neutral-700";
     }
+  };
+
+  const handleShare = () => {
+    if (!nft) return;
+
+    const shareText = `Just minted an amazing ${nft.metadata.rarity} NFT receipt from SplitBase! 🎉\n\n💰 Total: ${nft.metadata.totalAmount.toFixed(2)} USDC\n👥 Participants: ${nft.metadata.participantCount}\n📍 Location: ${nft.metadata.locationDisplayName}\n\nCheck it out!`;
+
+    composeCast({
+      text: shareText,
+      embeds: [window.location.href],
+    });
   };
 
   if (isLoading) {
@@ -132,6 +146,15 @@ export default function NFTDetailPage() {
           </div>
 
           <div className="flex items-center space-x-3">
+            <Button
+              onClick={handleShare}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2 bg-white hover:bg-neutral-50 border-2 border-brand-primary/20 hover:border-brand-primary/40 text-brand-primary hover:text-brand-primary/80 transition-all duration-200"
+            >
+              <Share2 className="w-4 h-4" />
+              <span>Share</span>
+            </Button>
             <Badge
               className={`${getRarityColor(nft.metadata.rarity)} text-sm font-bold px-3 py-1`}
             >

@@ -2,13 +2,13 @@
 
 import {
   useMiniKit,
-  useAddFrame,
+  // useAddFrame,
   useOpenUrl,
 } from "@coinbase/onchainkit/minikit";
 import WalletSection from "./ui/wallet-section";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet, Check, Home, Receipt, Users } from "lucide-react";
+import { Plus, Wallet, Home, Receipt, Users } from "lucide-react";
 import BottomNavigation from "./ui/bottom-navigation";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,18 +19,18 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
-  const [frameAdded, setFrameAdded] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { setFrameReady, isFrameReady } = useMiniKit();
+  // const [frameAdded, setFrameAdded] = useState(false);
+  // const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const addFrame = useAddFrame();
+  // const addFrame = useAddFrame();
   const openUrl = useOpenUrl();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    setMounted(true);
+    // setMounted(true);
     if (!isFrameReady) {
       setFrameReady();
     }
@@ -46,10 +46,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, [setFrameReady, isFrameReady]);
 
-  const handleAddFrame = useCallback(async () => {
-    const frameAdded = await addFrame();
-    setFrameAdded(Boolean(frameAdded));
-  }, [addFrame]);
+  // const handleAddFrame = useCallback(async () => {
+  //   const frameAdded = await addFrame();
+  //   setFrameAdded(Boolean(frameAdded));
+  // }, [addFrame]);
 
   const handleCreateClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -84,37 +84,37 @@ export default function AppLayout({ children }: AppLayoutProps) {
     },
   ];
 
-  const saveFrameButton = useMemo(() => {
-    if (context && !context.client.added) {
-      return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAddFrame}
-          className="text-brand-primary hover:text-brand-primary-dark transition-colors duration-200"
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          Save Frame
-        </Button>
-      );
-    }
+  // const saveFrameButton = useMemo(() => {
+  //   if (context && !context.client.added) {
+  //     return (
+  //       <Button
+  //         variant="ghost"
+  //         size="sm"
+  //         onClick={handleAddFrame}
+  //         className="text-brand-primary hover:text-brand-primary-dark transition-colors duration-200"
+  //       >
+  //         <Plus className="w-4 h-4 mr-1" />
+  //         Save Frame
+  //       </Button>
+  //     );
+  //   }
 
-    if (frameAdded) {
-      return (
-        <div className="flex items-center space-x-1 text-sm font-medium text-brand-secondary animate-fade-out">
-          <Check className="w-4 h-4 text-brand-secondary" />
-          <span>Saved</span>
-        </div>
-      );
-    }
+  //   if (frameAdded) {
+  //     return (
+  //       <div className="flex items-center space-x-1 text-sm font-medium text-brand-secondary animate-fade-out">
+  //         <Check className="w-4 h-4 text-brand-secondary" />
+  //         <span>Saved</span>
+  //       </div>
+  //     );
+  //   }
 
-    return null;
-  }, [context, frameAdded, handleAddFrame]);
+  //   return null;
+  // }, [context, frameAdded, handleAddFrame]);
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return null;
-  }
+  // // Prevent hydration mismatch by not rendering until mounted
+  // if (!mounted) {
+  //   return null;
+  // }
 
   return (
     <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)] overflow-hidden relative">
@@ -198,7 +198,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Right side - User Avatar and Name */}
           <div className="flex items-center space-x-2">
             <WalletSection />
-            {saveFrameButton && <div className="ml-2">{saveFrameButton}</div>}
+            {/* {saveFrameButton && <div className="ml-2">{saveFrameButton}</div>} */}
           </div>
         </div>
       </header>
