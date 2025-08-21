@@ -8,7 +8,7 @@ import {
 import WalletSection from "./ui/wallet-section";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Wallet, Check, Home, Receipt, Users, Star } from "lucide-react";
+import { Plus, Wallet, Check, Home, Receipt, Users } from "lucide-react";
 import BottomNavigation from "./ui/bottom-navigation";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -75,12 +75,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       label: "Create",
       onClick: handleCreateClick,
     },
-    {
-      href: "/nfts",
-      icon: Star,
-      label: "NFTs",
-      onClick: undefined,
-    },
+    
     {
       href: "/friends",
       icon: Users,

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, TrendingUp, Star, Crown, Sparkles } from "lucide-react";
 import { Friend } from "@/lib/types";
-import { getFriendsFromStorage, getTopFriends } from "@/lib/friend-utils";
+import { getTopFriends } from "@/lib/friend-utils";
 import WalletNotConnected from "@/app/components/ui/wallet-not-connected";
 
 // Calculate intimacy score for a friend
@@ -40,8 +40,15 @@ export default function LeaderboardPage() {
   const loadFriends = useCallback(async () => {
     if (address) {
       try {
-        const friends = await getFriendsFromStorage(address);
-        setFriends(friends);
+        const response = await fetch(`/api/friends?address=${address}`);
+        const result = await response.json();
+
+        if (result.success) {
+          setFriends(result.data);
+        } else {
+          console.error("Error loading friends:", result.error);
+          setFriends([]);
+        }
       } catch (error) {
         console.error("Error loading friends:", error);
         setFriends([]);
