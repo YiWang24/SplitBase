@@ -437,7 +437,7 @@ export default function SplitBillDetail({
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="w-full bg-gradient-to-r from-[var(--brand-primary)]/90 to-[var(--brand-primary)]/80 text-neutral-900 border-2 border-[var(--brand-primary)] hover:from-[var(--brand-primary)] hover:to-[var(--brand-primary)]/90 hover:border-[var(--brand-primary)]/80 shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+              className="w-full bg-white text-[var(--brand-primary)] border-2 border-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
             >
               <Share className="mr-2 h-4 w-4" />
               Share Split

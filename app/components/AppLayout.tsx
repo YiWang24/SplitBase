@@ -151,8 +151,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   isActive = pathname === "/bills";
                 } else if (item.label === "Create") {
                   isActive = pathname === "/create";
-                } else if (item.label === "NFTs") {
-                  isActive = pathname === "/nfts";
                 } else if (item.label === "Friends") {
                   isActive = pathname === "/friends";
                 }
