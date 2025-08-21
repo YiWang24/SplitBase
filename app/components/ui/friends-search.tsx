@@ -42,14 +42,14 @@ export default function FriendsSearch({
           Add Friend
         </Button>
 
-        {/* Leaderboard Button */}
+        {/* Friends Ranking Button */}
         <Button
-          onClick={() => router.push("/friends/leaderboard")}
+          onClick={() => router.push("/friends")}
           variant="outline"
           className="h-12 border-2 border-[#89d957]/30 text-[#89d957] font-bold hover:bg-[#89d957]/10 hover:border-[#89d957] transition-all duration-300 rounded-xl"
         >
           <Trophy className="mr-2 h-5 w-5" />
-          Leaderboard
+          Ranking
         </Button>
       </div>
     </div>
