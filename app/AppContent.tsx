@@ -66,8 +66,6 @@ export default function AppContent() {
           </span>
         </div>
 
-       
-
         {/* Main CTA Button */}
         <div className="relative w-full md:py-8 md:bg-gradient-to-br md:from-neutral-50/50 md:to-neutral-100/50 md:mx-0 md:px-8">
           <div className="md:max-w-2xl md:mx-auto">
@@ -95,6 +93,18 @@ export default function AppContent() {
               {/* Pulse ring effect */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl border-2 border-[#a8c44a]/30 animate-ping opacity-75"></div>
             </button>
+
+            {/* Roadmap Link */}
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => router.push("/roadmap")}
+                className="group inline-flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-brand-primary/80 to-brand-secondary/80 hover:from-brand-primary hover:to-brand-secondary border border-brand-primary/40 hover:border-brand-primary/60 rounded-full text-sm font-bold text-white hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <TrendingUp className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                <span>View Product Roadmap</span>
+                <div className="w-2 h-2 bg-white rounded-full group-hover:scale-150 transition-transform duration-300"></div>
+              </button>
+            </div>
           </div>
         </div>
 

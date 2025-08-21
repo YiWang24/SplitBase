@@ -151,30 +151,36 @@ function ParticipantItem({
 }
 
 interface SplitBillDetailProps {
-  billId: string;
+  billId?: string;
+  bill?: SplitBill;
   onError: (error: string) => void;
   onSuccess: (message: string) => void;
 }
 
 export default function SplitBillDetail({
   billId,
+  bill: billProp,
   onError,
   onSuccess,
 }: SplitBillDetailProps) {
   const { address } = useAccount();
+  const resolvedAddress = (address ??
+    "0x0000000000000000000000000000000000000000") as `0x${string}`;
   const { data: userBasename } = useName({
-    address: address!,
+    address: resolvedAddress,
     chain: base,
   });
-  const [bill, setBill] = useState<SplitBill | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [bill, setBill] = useState<SplitBill | null>(billProp ?? null);
+  const [isLoading, setIsLoading] = useState(!billProp);
   const [isJoining, setIsJoining] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
   const router = useRouter();
 
-  // Fetch bill details
+  // Fetch bill details only if billId is provided and no bill prop
   const fetchBillDetail = useCallback(async () => {
+    if (!billId || billProp) return;
+
     try {
       setIsLoading(true);
       const response = await fetch(`/api/split/${billId}`);
@@ -192,7 +198,7 @@ export default function SplitBillDetail({
     } finally {
       setIsLoading(false);
     }
-  }, [billId, onError]);
+  }, [billId, billProp, onError]);
 
   useEffect(() => {
     fetchBillDetail();
