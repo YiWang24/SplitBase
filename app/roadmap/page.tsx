@@ -87,6 +87,7 @@ export default function RoadmapPage() {
         amount: "46.13",
         status: "confirmed",
         nftReceiptId: "demo-nft-001",
+        displayName: "alice.base.eth",
       },
       {
         id: "p2",
@@ -94,6 +95,7 @@ export default function RoadmapPage() {
         amount: "46.13",
         status: "confirmed",
         nftReceiptId: "demo-nft-002",
+        displayName: "bob.base.eth",
       },
       {
         id: "p3",
@@ -101,6 +103,7 @@ export default function RoadmapPage() {
         amount: "46.13",
         status: "confirmed",
         nftReceiptId: "demo-nft-003",
+        displayName: "charlie.base.eth",
       },
       {
         id: "p4",
@@ -108,6 +111,7 @@ export default function RoadmapPage() {
         amount: "46.13",
         status: "confirmed",
         nftReceiptId: "demo-nft-004",
+        displayName: "diana.base.eth",
       },
     ],
   };
@@ -121,10 +125,10 @@ export default function RoadmapPage() {
     metadata: {
       title: "Restaurant Dinner Receipt",
       participants: [
-        "0x1234...5678",
-        "0xabcd...efgh",
-        "0x5678...90ab",
-        "0x90ab...cdef",
+        "alice.base.eth",
+        "bob.base.eth",
+        "charlie.base.eth",
+        "diana.base.eth",
       ],
       totalAmount: 184.5,
       location: "ramen",
@@ -432,7 +436,7 @@ export default function RoadmapPage() {
         <div className="space-y-3">
           <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
             <span className="text-sm text-gray-600">Employee:</span>
-            <span className="font-medium">John Doe</span>
+            <span className="font-medium">alice.base.eth</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
             <span className="text-sm text-gray-600">Department:</span>
@@ -548,7 +552,7 @@ export default function RoadmapPage() {
           </div>
           <div className="flex justify-between items-center p-3 bg-green-50 rounded">
             <span className="text-sm text-gray-600">Recipient:</span>
-            <span className="font-medium">John Doe</span>
+            <span className="font-medium">bob.base.eth</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-green-50 rounded">
             <span className="text-sm text-gray-600">Network:</span>
@@ -642,7 +646,7 @@ export default function RoadmapPage() {
           </div>
           <div className="flex justify-between items-center p-3 bg-indigo-50 rounded">
             <span className="text-sm text-gray-600">Account:</span>
-            <span className="font-medium">Travel & Meals</span>
+            <span className="font-medium">Travel & Entertainment</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-indigo-50 rounded">
             <span className="text-sm text-gray-600">Amount:</span>
