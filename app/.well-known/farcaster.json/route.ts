@@ -23,21 +23,31 @@ export async function GET() {
     frame: withValidProperties({
       version: "1",
       name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-      subtitle: process.env.NEXT_PUBLIC_APP_SUBTITLE,
-      description: process.env.NEXT_PUBLIC_APP_DESCRIPTION,
-      screenshotUrls: ["https://split.yiw.me/s1.png"],
+      homeUrl: URL,
       iconUrl: process.env.NEXT_PUBLIC_APP_ICON,
+
       splashImageUrl: process.env.NEXT_PUBLIC_APP_SPLASH_IMAGE,
       splashBackgroundColor: process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR,
-      homeUrl: URL,
-      webhookUrl: `${URL}/api/webhook`,
+
       primaryCategory: process.env.NEXT_PUBLIC_APP_PRIMARY_CATEGORY,
-      tags: ["splitbills","base","usdc","web3","finance"],
-      heroImageUrl: process.env.NEXT_PUBLIC_APP_HERO_IMAGE,
+      tags: ["splitbills", "base", "usdc", "web3", "finance"],
+
+
+      subtitle: process.env.NEXT_PUBLIC_APP_SUBTITLE,
+      description: process.env.NEXT_PUBLIC_APP_DESCRIPTION,
       tagline: process.env.NEXT_PUBLIC_APP_TAGLINE,
+      heroImageUrl: process.env.NEXT_PUBLIC_APP_HERO_IMAGE,
+      screenshotUrls: ["https://split.yiw.me/s1.png"],
+
       ogTitle: process.env.NEXT_PUBLIC_APP_OG_TITLE,
       ogDescription: process.env.NEXT_PUBLIC_APP_OG_DESCRIPTION,
       ogImageUrl: process.env.NEXT_PUBLIC_APP_OG_IMAGE,
+
+      webhookUrl: `${URL}/api/webhook`,
+
+      
+      
+      
     }),
     baseBuilder: {
       allowedAddresses: ["0x2c5e6F4E0fb15540bEe47357a6E595Ec3eeC9FcB"],
