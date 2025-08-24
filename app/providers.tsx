@@ -1,23 +1,23 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { baseSepolia } from "wagmi/chains";
+import { base } from "wagmi/chains";
 import { createConfig, WagmiProvider, http } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
-import { coinbaseWallet } from 'wagmi/connectors';
+import { coinbaseWallet } from "wagmi/connectors";
 // Create a client
 const queryClient = new QueryClient();
 
 // Create wagmi config
 const config = createConfig({
-  chains: [baseSepolia],
+  chains: [base],
   transports: {
-    [baseSepolia.id]: http(),
+    [base.id]: http(),
   },
   connectors: [
     coinbaseWallet({
-      appName: 'onchainkit',
+      appName: "onchainkit",
     }),
   ],
   // Enable connection persistence
@@ -30,7 +30,7 @@ export function Providers(props: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider
           apiKey={process.env.NEXT_PUBLIC_CDP_CLIENT_API_KEY}
-          chain={baseSepolia}
+          chain={base}
           config={{
             appearance: {
               mode: "auto",
