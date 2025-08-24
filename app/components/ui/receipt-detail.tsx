@@ -364,7 +364,7 @@ export default function ReceiptDetail({
                         className="border-success-main/50 text-success-dark hover:bg-success-main/10"
                         onClick={() => {
                           if (existingNFTId) {
-                            window.open(`/nfts/${existingNFTId}`, "_blank");
+                            window.location.href = `/nfts/${existingNFTId}`;
                           }
                         }}
                       >

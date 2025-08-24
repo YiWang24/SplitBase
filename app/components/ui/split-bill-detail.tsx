@@ -452,13 +452,13 @@ export default function SplitBillDetail({
             {/* View Receipt Button - Only show for completed bills */}
             {bill.status === "completed" && (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push(`/receipts/${bill.id}`)}
-                className="w-full bg-gradient-to-r from-[var(--brand-secondary)]/90 to-[var(--brand-secondary)]/80 text-neutral-900 border-2 border-[var(--brand-secondary)] hover:from-[var(--brand-secondary)] hover:to-[var(--brand-secondary)]/90 hover:border-[var(--brand-secondary)]/80 shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/receipts/${bill.id}`)}
+              className="w-full bg-gradient-to-r from-green-100 via-green-200 to-green-100 text-neutral-900 border-2 border-green-400 hover:bg-gradient-to-r hover:from-green-200 hover:via-green-300 hover:to-green-200 hover:border-green-500 shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
               >
-                <Receipt className="mr-2 h-4 w-4" />
-                View Receipt
+              <Receipt className="mr-2 h-4 w-4" />
+              View Receipt
               </Button>
             )}
           </div>
